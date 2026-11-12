@@ -1,0 +1,67 @@
+Sheet,Field_Name,Data_Type,Category,Description,Values_or_Range
+Telesales_Calls_Fact,Call_ID,String,Core,"Unique call / conversation ID (12 digits, ascending with time)","181,454 distinct values"
+Telesales_Calls_Fact,Call_Start_Datetime,Datetime,Core,"Call start, Australian Eastern time (YYYY-MM-DD HH:MM:SS)",2025-11-01 08:05:56 to 2026-10-20 19:59:28
+Telesales_Calls_Fact,Call_Date,Date,Core,Date of the call,2025-11-01 to 2026-10-20
+Telesales_Calls_Fact,Week_Ending,Date,Core,"Reporting week ending Friday (weeks run Saturday to Friday, e.g. WE3010 = 2026-10-30)",2025-11-07 to 2026-10-23
+Telesales_Calls_Fact,Month,String,Core,Calendar month (YYYY-MM),2025-11 / 2025-12 / 2026-01 / 2026-02 / 2026-03 / 2026-04 / 2026-05 / 2026-06 / 2026-07 / 2026-08 / 2026-09 / 2026-10
+Telesales_Calls_Fact,Agent_ID,String,Agent,Consultant ID (join to Agent_Dim),68 distinct values
+Telesales_Calls_Fact,Team_Lead,String,Agent,Consultant's team lead,Arnel Vergara / Dennis Velasco / Joanna Medina / Katrina Uy / Lorna Castro / Marisol Aguinaldo / Paulo Serrano / Rico Bernabe
+Telesales_Calls_Fact,Agent_Tenure_Months,Integer,Agent,"Consultant tenure on the call date, in months (under 3 = nesting)",0 - 59
+Telesales_Calls_Fact,Customer_ID,String,Customer,Synthetic Optus customer ID (OPT-XXXXXXXX); repeat contacts share the ID,"112,976 distinct values"
+Telesales_Calls_Fact,Customer_Type,String,Customer,New to Optus / Existing Optus customer,Existing Optus customer / New to Optus
+Telesales_Calls_Fact,Existing_Optus_Products,String,Customer,Services the customer already holds with Optus at the time of the call,Home Internet / Mobile / Mobile + Home Internet / No Optus services / Prepaid
+Telesales_Calls_Fact,State,String,Customer,Australian state/territory,ACT / NSW / NT / QLD / SA / TAS / VIC / WA
+Telesales_Calls_Fact,Call_Direction,String,Core,"Inbound, or Outbound (callback) made by the consultant",Inbound / Outbound (callback)
+Telesales_Calls_Fact,Call_Reason,String,Core,Why the customer called (standardised from the FCR audit identifiers),Billing Inquiry / Cancellation / Change of Ownership / Connected Device / Tablet / Home Internet Recontract / Misrouted / Other / Mobile Recontract / Device Upgrade / NBN Relocation / New 5G/4G Home Internet / New Mobile Plan / Port In / New NBN Service / Order Status / Plan Change / Prepaid Inquiry / Prepaid to Postpaid / Tech Issue
+Telesales_Calls_Fact,Sales_Opportunity_Flag,Y/N,Sales,"Y if the call reason is a sales reason (new service, recontract, connected device)",N / Y
+Telesales_Calls_Fact,Handle_Time_Seconds,Integer,Core,Talk + hold + wrap time in seconds,"20 - 6,513"
+Telesales_Calls_Fact,Hold_Time_Seconds,Integer,Core,Time on hold in seconds,"0 - 2,818"
+Telesales_Calls_Fact,Call_Result,String,Sales,Disposition: Sale / Callback / No Answer / Rejected (the four Optus records; Rejected = no sale),Callback / No Answer / Rejected / Sale
+Telesales_Calls_Fact,Sale_Flag,Y/N,Sales,Y if the call closed at least one sale (see Sales_Orders for lines),N / Y
+Telesales_Calls_Fact,Sales_Category,String,Sales,Optus reporting category of the primary sale (null if no sale),Connected Device - New Connection / Home - Renewal / Postpaid Voice - New Connection / Postpaid Voice - Renewal / Total Home - New Connection
+Telesales_Calls_Fact,Credit_Check_Result,String,Eligibility,"Jarvis eligibility result. Jarvis shows eligibility only, no credit score",Eligible / Eligible after referral / Not eligible / Not run / Service unavailable
+Telesales_Calls_Fact,ID_Verification_Result,String,Eligibility,Pass / Fail / Not run,Fail / Not run / Pass
+Telesales_Calls_Fact,Port_In_Requested_Flag,Y/N,Eligibility,Customer asked to bring their number from another provider,N / Y
+Telesales_Calls_Fact,Port_In_Status,String,Eligibility,Completed / Not started / Failed - account number unavailable (null if no port-in),Completed / Failed - account number unavailable / Not started
+Telesales_Calls_Fact,Lost_Sale_Flag,Y/N,Lost sales,Y if the customer intended to buy and the sale did not close for an identified reason,N / Y
+Telesales_Calls_Fact,Lost_Sale_Driver,String,Lost sales,Customer / People / System (null if not a lost sale),Customer / People / System
+Telesales_Calls_Fact,Lost_Sale_Reason,String,Lost sales,Structured reason within the driver,Call disconnected / audio issue / Credit check service unavailable / Failed ID verification / Failed credit check / IVR misrouted the call / Incorrect information given / Insufficient discovery and probing - irrelevant plan recommended / Jarvis error - order could not be submitted / Jarvis slow / timed out / No ownership - deferred to promised callback / Objection not handled / Port-in: previous provider account number unavailable / Price / comparing other providers / Serviceability / stock lookup failed / Transferred to Retention without checking other plans / Wants to think about it
+Telesales_Calls_Fact,Callback_Promised_Flag,Y/N,Lost sales,Consultant promised the customer a callback,N / Y
+Telesales_Calls_Fact,Jarvis_Error_Flag,Y/N,System,A Jarvis error happened on the call,N / Y
+Telesales_Calls_Fact,Jarvis_Error_Type,String,System,Type of Jarvis error (null if none),Credit check API error / Order submission failed / Plan not loading / Serviceability lookup failed / Session timeout
+Telesales_Calls_Fact,Jarvis_Ticket_ID,String,System,Incident ticket raised for the error (null if not ticketed),"1,696 distinct values"
+Telesales_Calls_Fact,Jarvis_Ticket_Resolution_Days,Integer,System,Days from ticket to resolution,1 - 20
+Telesales_Calls_Fact,Cross_Sell_Opportunity_Flag,Y/N,Cross-sell,"On a sale call, the customer lacks the complementary Optus service. Cross-sell started in August 2026: N before then",N / Y
+Telesales_Calls_Fact,Cross_Sell_Product,String,Cross-sell,The product that could be cross-sold,Home Internet (NBN/5G) / Postpaid Mobile (SIM only)
+Telesales_Calls_Fact,Cross_Sell_Attempted_Flag,Y/N/NA,Cross-sell,Consultant offered the cross-sell. N/A if no opportunity,N / N/A / Y
+Telesales_Calls_Fact,Cross_Sell_Outcome,String,Cross-sell,Sold / Declined / Not attempted / N/A,Declined / N/A / Not attempted / Sold
+Telesales_Calls_Fact,Transfer_Flag,Y/N,FCR,Call transferred to another team,N / Y
+Telesales_Calls_Fact,Transfer_Destination,String,FCR,"Optus queue the call was transferred to (Retention Voice, Service Voice, Service Prepaid Voice, ...)",26 distinct values
+Telesales_Calls_Fact,Transfer_Valid_Flag,Y/N,FCR,N if the consultant could have resolved it (avoidable transfer),N / Y
+Telesales_Calls_Fact,Invalid_Transfer_Reason,String,FCR,Why the transfer was avoidable,Basic billing question the consultant could resolve / Plan change the consultant could process / Sent to Retention without checking other plans
+Telesales_Calls_Fact,Repeat_14D_Flag,Y/N,FCR,Same customer called again within 14 days,N / Y
+Telesales_Calls_Fact,Repeat_Timeline,String,FCR,<1hr / >1hr between this call and the repeat contact,<1hr / >1hr
+Telesales_Calls_Fact,Next_Contact_Call_ID,String,FCR,Call ID of the repeat contact,"68,478 distinct values"
+Telesales_Calls_Fact,Is_Repeat_Contact_Flag,Y/N,FCR,This call is itself a repeat of an earlier unresolved call,N / Y
+Telesales_Calls_Fact,Previous_Call_ID,String,FCR,Earlier call this one repeats,"68,478 distinct values"
+Telesales_Calls_Fact,FCR_Outcome,String,FCR,Achieved / Repeat / Transfer / Transfer & Repeat (as in the Concentrix FCR slide),Achieved / Not applicable (no answer) / Repeat / Transfer / Transfer & Repeat
+Telesales_Calls_Fact,FCR_Flag,Y/N/NA,FCR,Y if not transferred and no repeat within 14 days. N/A for unanswered outbound calls,N / N/A / Y
+Telesales_Calls_Fact,FCR_Locked_Flag,Y/N,FCR,Y once the 14-day repeat window has closed (FCR is final). N = unlocked,N / Y
+Sales_Orders,Order_ID,String,Core,Unique order line,"13,176 distinct values"
+Sales_Orders,Call_ID,String,Core,Call the sale was made on,"13,087 distinct values"
+Sales_Orders,Sale_Source,String,Sales,Primary (what the customer called for) or Cross-sell,Cross-sell / Primary
+Sales_Orders,Sales_Category,String,Sales,Optus reporting category,Connected Device - New Connection / Home - Renewal / Postpaid Voice - New Connection / Postpaid Voice - Renewal / Total Home - New Connection
+Sales_Orders,Product_Line,String,Sales,Postpaid Mobile / NBN / 5G Home / 4G Home / Connected Device,4G Home Internet / 5G Home Internet / Connected Device / NBN / Postpaid Mobile (SIM only)
+Sales_Orders,Plan_Code,String,Sales,Join to Product_Catalog,18 distinct values
+Sales_Orders,Monthly_Revenue,Float (AUD),Revenue,Monthly plan price at sale (promo price where a promo applies),10 - 119
+Sales_Orders,Standard_Monthly_Price,Float (AUD),Revenue,Monthly price after the promo ends,10 - 129
+Sales_Orders,First_12M_Revenue,Float (AUD),Revenue,Plan revenue over the first 12 months,"120 - 1,428"
+Sales_Orders,Device_Included_Flag,Y/N,Sales,Recontract included a phone (device price not in the data),N / Y
+Elevate_Audits,Overall_Score_Pct,Float,Quality,Elevate audit score (%),35.0 - 100.0
+Elevate_Audits,Discovery_Probing_Score,Integer,Quality,1 (poor) to 5 (excellent),1 - 5
+Elevate_Audits,Cross_Sell_Effectiveness,String,Quality,Effective / Partially effective / Not effective / N/A (cross-sell fields are N/A before August 2026),Effective / N/A / Not effective / Partially effective
+Elevate_Audits,Cross_Sell_Not_Attempted_Reason,String,Quality,Structured reason when an opportunity was not attempted,Assumed customer not interested / Customer not eligible (credit) / Customer short on time / Did not probe for other services / Focused on completing the order (Jarvis issue)
+Elevate_Audits,Auditor_Comments,String,Quality,Free-text comment,24 distinct values
+FCR_Audits,Opportunity_Identifier,String,FCR,People / Technology / Customer / Process,Customer / People / Process / Technology
+FCR_Audits,FCR_Identifier,String,FCR,Topic of the unresolved call (as in the Optus FCR file),30 distinct values
+FCR_Audits,Avoidable_Flag,Y/N,FCR,Y if the repeat or transfer was within the consultant's or process's control,N / Y

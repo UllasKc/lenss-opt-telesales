@@ -1,0 +1,17 @@
+deploy/.state/
+**/node_modules/
+appkit-genie-app/dist/
+~$*
+__pycache__/
+.env
+.venv/
+.claude/
+**/.databricks/
+*.log
+
+# Optus client source material: never committed
+emails.txt
+TELESALESservices.docx
+FCR as of*.xlsx
+image (1).png
+image (2).png

@@ -1,0 +1,19 @@
+Plan_Code,Product_Line,Plan_Name,Data_or_Speed,Promo_Monthly_Price,Promo_Months,Standard_Monthly_Price,Minimum_Cost,Modem_Term_Months,New_Services_Only,Inclusions,Price_Source
+MOB-S-PROMO,Postpaid Mobile (SIM only),Small Promo Plan,"100GB for 12 months, then 60GB",39,12,60,,,Y,No lock-in contract; no excess data charges,Optus plan sheet
+MOB-S-CP,Postpaid Mobile (SIM only),Small Choice Plus Plan,60GB,60,0,60,,,N,No lock-in contract; no excess data charges,Optus plan sheet
+MOB-PROMO,Postpaid Mobile (SIM only),Promo Plan,360GB,69,12,79,,,N,$10/month subscription credit for 12 months; international calls included,Optus plan sheet (price after 12 months assumed)
+MOB-M-CP,Postpaid Mobile (SIM only),Medium Choice Plus Plan,240GB,70,0,70,,,N,Stream videos regularly and call family overseas,Optus plan sheet
+MOB-L-CP,Postpaid Mobile (SIM only),Large Choice Plus Plan,480GB,90,0,90,,,N,$20/month subscription credit while on plan,Optus plan sheet
+NBN-25,NBN,Basic Plan,25 Mbps,73,12,83,379.0,24.0,N,Ultra WiFi Modem (Gen 2) $0 over 24 months; unlimited data; 4G backup,Optus plan sheet (price after 12 months assumed)
+NBN-50,NBN,Everyday Plan,50 Mbps,87,12,97,393.0,24.0,N,Ultra WiFi Modem (Gen 2) $0 over 24 months; unlimited data; 4G backup,Optus plan sheet (price after 12 months assumed)
+NBN-500,NBN,Fast Plan,"500 Mbps (FTTP, HFC)",89,12,99,395.0,24.0,N,Ultra WiFi Modem (Gen 2) $0 over 24 months; unlimited data; 4G backup,Optus plan sheet (price after 12 months assumed)
+NBN-500-PROMO,NBN,Promo Plus Plan,"500 Mbps (FTTP, HFC)",69,6,89,375.0,24.0,N,$10/month subscription credit; Ultra WiFi Modem $0 over 24 months; 4G backup,Optus plan sheet (price after 6 months assumed = Fast Plan)
+NBN-820,NBN,Ultrafast Plan,"820 Mbps (FTTP, HFC)",119,12,129,425.0,24.0,N,Ultra WiFi Modem (Gen 2) $0 over 24 months; unlimited data; 4G backup,Optus plan sheet (price after 12 months assumed)
+5G-50,5G Home Internet,Everyday Plan,50 Mbps,59,12,69,527.0,36.0,N,5G modem $0 over 36 months; unlimited data; 40 Mbps satisfaction guarantee,Optus plan sheet (price after 12 months assumed)
+5G-93,5G Home Internet,Fast Plan,93 Mbps,69,12,79,537.0,36.0,N,5G modem $0 over 36 months; unlimited data; 50 Mbps satisfaction guarantee,Optus plan sheet (price after 12 months assumed)
+5G-93-PROMO,5G Home Internet,Promo Plan,93 Mbps,45,6,69,513.0,36.0,N,$10/month subscription credit; 5G modem $0 over 36 months,Optus plan sheet (price after 6 months assumed = Fast Plan)
+5G-230,5G Home Internet,Superfast Plan,230 Mbps,89,12,99,557.0,36.0,N,5G modem $0 over 36 months; uncapped speed; Netflix included,Optus plan sheet (price after 12 months assumed)
+4G-15,4G Home Internet,Everyday Basic 4G Plan,15 Mbps,49,12,59,265.0,24.0,N,Plug & play 4G modem $0 over 24 months; unlimited data,Optus plan sheet
+CD-WATCH,Connected Device,Smartwatch Plan,Shares mobile number,10,0,10,,,N,Placeholder: no connected-device plans were supplied,Assumed
+CD-TAB-30,Connected Device,Tablet Data Plan 30GB,30GB,35,0,35,,,N,Placeholder: no connected-device plans were supplied,Assumed
+CD-TAB-100,Connected Device,Tablet Data Plan 100GB,100GB,45,0,45,,,N,Placeholder: no connected-device plans were supplied,Assumed

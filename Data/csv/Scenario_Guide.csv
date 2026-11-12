@@ -1,0 +1,8 @@
+Scenario,Business_Question,Filter_Logic,Sep_2026_Calls
+Scenario 1: Missed Mobile Cross-Sell on NBN Sales,Home internet sales where the customer has no Optus mobile and the consultant did not offer one,Sales_Category='Total Home - New Connection' AND Cross_Sell_Opportunity_Flag='Y' AND Cross_Sell_Attempted_Flag='N',302
+Scenario 2: Jarvis Errors Blocking Sales,"Sales lost to Jarvis errors: how many, which error types, how long tickets take, revenue at risk",Jarvis_Error_Flag='Y' AND Lost_Sale_Flag='Y',115
+Scenario 3: Lost Sales from Unresolved First Calls,First calls with a sales reason that did not close and brought the customer back within 14 days,Repeat_14D_Flag='Y' AND Sales_Opportunity_Flag='Y' AND Sale_Flag='N' AND Is_Repeat_Contact_Flag='N',1957
+Scenario 4: Avoidable Transfers,"Transfers the consultant could have resolved (Retention without checking plans, basic billing) and the FCR uplift from fixing them",Transfer_Valid_Flag='N',730
+Scenario 5: Customer Eligibility Blockers,"Sales lost to failed credit check, failed ID verification or a missing port-in account number, by product and state",Lost_Sale_Driver='Customer',288
+Analytical: Conversion vs Target,"Weekly new-sales and renewals conversion against target, by product, team lead and consultant",SUM(sales by category) / COUNT(calls) by Week_Ending vs Targets,Analytical
+Analytical: Discovery Coaching,Consultants with low conversion and low Elevate discovery scores: who to coach first,Elevate_Audits.Discovery_Probing_Score <= 2 joined to conversion by Agent_ID,Analytical

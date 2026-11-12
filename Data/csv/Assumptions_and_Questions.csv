@@ -1,0 +1,17 @@
+Area,What_the_data_does,Basis,Question_for_the_team
+Volume,"About 16,000 handled calls a month (about 3,700 a week)","Derived: October sales at the slide's 4.0% new-sales and 3.3% renewals conversion; matches '134 of 3,716 contacts'","PENDING (Optus to confirm): real monthly call volume, and is conversion over all handled calls?"
+Period,"1 Nov 2025 to Tue 20 Oct 2026: 'today' is 20 October, with 11 days left in the month; September is the last full month; weeks Saturday to Friday",Leaders review the dashboard in the last 10 days of the month; slide week labels (WE1109 = Fri 11 Sep 2026),-
+Sales,"October follows Optus's table (CD 27, Home Renewals 202, PV NC 186, PV Renewals 329) except Total Home NC, which follows the slide (459, about 10% above the table's 417); with the cut at 20 October only the first 20 days are shown",TELESALESservices.docx; image (2).png,CONFIRMED: the slide's Home figure (about 10% higher) is correct
+Sales,The September slide weeks follow the slide's conversion by product exactly,image (2).png,-
+FCR,Weekly FCR mix follows the slide (Achieved / Repeat / Transfer / Both); repeats within 14 days; <1hr 68% of repeats,"image (1).png, FCR file Timeline",-
+FCR,"Transfer destinations: Optus's 26 queues. Retention Voice 37.7%, Service Voice 15.8%, Service Prepaid Voice 13.9% (slide); the other queues' shares are synthetic; about 15% avoidable",image (1).png; Optus queue list (review meeting),PENDING (Optus to share): the share of transfers per queue
+Lost sales,"Drivers: Customer 43.3%, People 25.8%, System 30.9%; Jarvis-blocked sales about 0.6% of calls",Michelle's email; review meeting,CONFIRMED: the remaining 30.9% is system error
+Targets,"New sales conversion target 5.4%. Mobile 1.6%, renewals 3.5%, FCR 50%, cross-sell attempt 60%, AHT 900s are placeholders",Slide (confirmed) + assumed,CONFIRMED 5.4%. Other targets still placeholders
+Prices,"Mobile, NBN, 5G and 4G prices from the plan sheet; prices after the promo period are assumed (+$10, or the matching non-promo plan)",TELESALESservices.docx screenshots,DEFERRED: post-promo prices
+Prices,"Connected Device plans (Smartwatch $10, Tablet 30GB $35, Tablet 100GB $45) are placeholders",Assumed,DEFERRED: connected-device plans and prices
+Revenue,"Revenue = monthly plan price; no device repayments, one-off fees or modem charges",Email asks for 'Monthly revenue',DEFERRED: device sales / repayments
+Call result,"Sale, Callback, No Answer, Rejected only. Transfers, Jarvis errors and eligibility are their own columns",Meeting minutes email; review meeting,CONFIRMED: these are the only call outcomes
+Cross-sell,Cross-sell is new and consultants are in training: it starts in August 2026 and the attempt rate builds month by month; Elevate cross-sell fields are N/A before August,Review meeting,"CONFIRMED: cross-sell is new, under training"
+Team,"8 teams as in the FCR file: consultant names and IDs are real; team lead names are synthetic; performance, hire dates and calls synthetic; 3 former consultants with synthetic names",FCR file; review meeting,CONFIRMED: no real team lead names. PENDING: confirm real consultant names are fine
+Eligibility,"Credit check shows eligibility only (no credit score), as in Jarvis",Email,-
+Not in the data,"No CSAT/NPS, no in-call prompts, no channel shift to other channels, no IVR/queue wait time",Email; review meeting,CONFIRMED: no CSAT or NPS

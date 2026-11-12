@@ -1,0 +1,16 @@
+Theme,Natural_Language_Question
+Trend,"What is the daily new sales conversion this month, and how does it compare with the 5.4% target?"
+Trend,Show weekly conversion for Postpaid Voice and Home new connections over the last 8 weeks.
+Product,"Which product categories sold most last month, and what monthly revenue did they bring?"
+Cross-sell,"How many NBN sales last month had no mobile cross-sell offered, and what would a 20% take-up be worth?"
+Cross-sell,Which consultants have the lowest cross-sell attempt rate on home internet sales?
+System,"How many sales were lost to Jarvis errors this month, and what is the conversion impact in points?"
+System,What is the average Jarvis ticket resolution time by error type?
+Lost sales,"Break down lost sales by driver (Customer, People, System) and reason."
+Eligibility,Which states have the highest failed credit check rate on new connections?
+FCR,"What is FCR achieved, repeat and transfer % by week ending?"
+FCR,What are the top transfer destinations and what share of transfers were avoidable?
+FCR,"How many repeat contacts closed a sale, and what is their conversion?"
+Coaching,Which team leads' teams have the lowest discovery scores in Elevate audits?
+Agent,Do nesting consultants (under 3 months) convert less than tenured ones?
+Efficiency,"What is the average handle time for sale calls vs non-sale calls, by product?"

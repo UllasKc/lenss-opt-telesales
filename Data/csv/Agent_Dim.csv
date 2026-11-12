@@ -1,0 +1,69 @@
+Agent_ID,Agent_Name,Team_Lead_ID,Team_Lead,Hire_Date,Exit_Date,Status,Tenure_Months_At_Data_End,Tenure_Band
+AG4029357,Tamago Ranon,TL-01,Marisol Aguinaldo,2023-10-06,,Active,37,12m+
+AG4029371,Yumi Carreon,TL-01,Marisol Aguinaldo,2022-09-02,,Active,50,12m+
+AG4029682,Ronn Casoco,TL-01,Marisol Aguinaldo,2024-04-12,,Active,31,12m+
+AG4029687,Rassel Bebas,TL-01,Marisol Aguinaldo,2024-08-19,,Active,27,12m+
+AG4029900,Peter Nograles,TL-01,Marisol Aguinaldo,2023-03-11,,Active,44,12m+
+AG4029946,Phau Sanchez,TL-01,Marisol Aguinaldo,2024-03-18,,Active,32,12m+
+AG5100103,Will Domingo (former),TL-01,Marisol Aguinaldo,2026-04-10,2026-05-18,Exited,1,Nesting (<3m)
+AG4029062,King Ombao,TL-02,Rico Bernabe,2026-03-13,,Active,8,6-12m
+AG4029064,Kelly Lagarto,TL-02,Rico Bernabe,2022-03-31,,Active,55,12m+
+AG4029069,Maita Pili,TL-02,Rico Bernabe,2022-01-01,,Active,58,12m+
+AG4029070,Jano Mohammad,TL-02,Rico Bernabe,2023-05-05,,Active,42,12m+
+AG4029074,Khen Derpo,TL-02,Rico Bernabe,2022-11-01,,Active,48,12m+
+AG4029076,Konsi Vasquez,TL-02,Rico Bernabe,2022-11-02,,Active,48,12m+
+AG4029080,Mark Medes,TL-02,Rico Bernabe,2026-05-06,,Active,6,3-6m
+AG4029771,Lloyd Diaz,TL-02,Rico Bernabe,2026-06-23,,Active,4,3-6m
+AG4029897,Kimm Jose,TL-02,Rico Bernabe,2022-12-10,,Active,47,12m+
+AG4029355,Bob Tan,TL-03,Lorna Castro,2023-04-14,,Active,43,12m+
+AG4029358,Chad Isaac,TL-03,Lorna Castro,2026-08-19,,Active,3,3-6m
+AG4029364,Ann Luna,TL-03,Lorna Castro,2022-04-28,,Active,54,12m+
+AG4029368,Ell Valeriano,TL-03,Lorna Castro,2026-09-04,,Active,2,Nesting (<3m)
+AG4029373,Arvin Bantugan,TL-03,Lorna Castro,2024-10-09,,Active,25,12m+
+AG4029374,Eli Villaflor,TL-03,Lorna Castro,2025-12-28,,Active,10,6-12m
+AG4029693,Corrine Aragon,TL-03,Lorna Castro,2022-10-21,,Active,49,12m+
+AG4029890,Daivie Candido,TL-03,Lorna Castro,2023-11-08,,Active,36,12m+
+AG4029891,Iris Pasok,TL-03,Lorna Castro,2026-06-19,,Active,5,3-6m
+AG4029071,Miguel Regalado,TL-04,Dennis Velasco,2024-06-13,,Active,29,12m+
+AG4029072,Sammie Ansari,TL-04,Dennis Velasco,2025-06-05,,Active,17,12m+
+AG4029073,Gill Calagos,TL-04,Dennis Velasco,2024-07-28,,Active,27,12m+
+AG4029077,Josie Eusebio,TL-04,Dennis Velasco,2024-12-29,,Active,22,12m+
+AG4029079,Rems Gonzales,TL-04,Dennis Velasco,2026-07-27,,Active,3,3-6m
+AG4029366,Justine Malate,TL-04,Dennis Velasco,2022-07-26,,Active,51,12m+
+AG4029367,Carlo Capiral,TL-04,Dennis Velasco,2021-11-29,,Active,59,12m+
+AG4029688,Aaron Ong,TL-04,Dennis Velasco,2021-12-24,,Active,58,12m+
+AG4029692,Monica Bersalona,TL-04,Dennis Velasco,2024-10-21,,Active,25,12m+
+AG4029892,Charm Evangelista,TL-04,Dennis Velasco,2022-03-16,,Active,56,12m+
+AG5100106,Lou Lacson (former),TL-04,Dennis Velasco,2026-04-20,2026-07-28,Exited,3,3-6m
+AG4029066,Matthew Pantig,TL-05,Joanna Medina,2026-02-02,,Active,9,6-12m
+AG4029068,Milo Datu,TL-05,Joanna Medina,2024-02-26,,Active,32,12m+
+AG4029361,Ned Bueno,TL-05,Joanna Medina,2024-04-20,,Active,31,12m+
+AG4029363,Nathan Sadsad,TL-05,Joanna Medina,2022-06-17,,Active,53,12m+
+AG4029689,Nathan Gabi,TL-05,Joanna Medina,2025-03-18,,Active,20,12m+
+AG4029906,Neil Abundo,TL-05,Joanna Medina,2026-03-31,,Active,7,6-12m
+AG4029684,Jesse Elnar,TL-06,Paulo Serrano,2022-01-12,,Active,58,12m+
+AG4029893,Kenn Ansis,TL-06,Paulo Serrano,2024-02-03,,Active,33,12m+
+AG4029896,Mary Almerez,TL-06,Paulo Serrano,2022-03-20,,Active,56,12m+
+AG4029898,Jann Peralta,TL-06,Paulo Serrano,2024-11-11,,Active,24,12m+
+AG4029902,Jhoy Lozendo,TL-06,Paulo Serrano,2022-12-14,,Active,47,12m+
+AG4029673,Khenny Villodres,TL-07,Katrina Uy,2025-04-06,,Active,19,12m+
+AG4029677,Anne Recio,TL-07,Katrina Uy,2021-11-07,,Active,60,12m+
+AG4029678,Laine Mapili,TL-07,Katrina Uy,2026-02-24,,Active,8,6-12m
+AG4029679,Hugo Pagsisihan,TL-07,Katrina Uy,2024-09-14,,Active,26,12m+
+AG4029680,Jobbie Temporada,TL-07,Katrina Uy,2026-05-02,,Active,6,3-6m
+AG4029681,Nath Guevarra,TL-07,Katrina Uy,2023-06-07,,Active,41,12m+
+AG4029683,Jayr Lopez,TL-07,Katrina Uy,2022-04-08,,Active,55,12m+
+AG4029686,Gwen Gubat,TL-07,Katrina Uy,2021-12-05,,Active,59,12m+
+AG4029690,Gelo DelaCruz,TL-07,Katrina Uy,2026-09-15,,Active,2,Nesting (<3m)
+AG4029691,Hayden Herrera,TL-07,Katrina Uy,2022-05-31,,Active,53,12m+
+AG4029715,Christina Borja,TL-07,Katrina Uy,2026-06-25,,Active,4,3-6m
+AG4029903,Gell Mendoza,TL-07,Katrina Uy,2026-09-21,,Active,2,Nesting (<3m)
+AG5100111,Ola Ramos (former),TL-07,Katrina Uy,2023-06-03,2026-02-03,Exited,32,12m+
+AG4029894,Cyra Castillo,TL-08,Arnel Vergara,2024-02-19,,Active,33,12m+
+AG4029895,James Sanatana,TL-08,Arnel Vergara,2025-02-17,,Active,21,12m+
+AG4029899,Cherrie Catindig,TL-08,Arnel Vergara,2025-02-14,,Active,21,12m+
+AG4029901,Ariel Ontengco,TL-08,Arnel Vergara,2024-09-23,,Active,25,12m+
+AG4029904,Henry Teodoro,TL-08,Arnel Vergara,2023-09-08,,Active,38,12m+
+AG4029907,France Lalimos,TL-08,Arnel Vergara,2024-08-10,,Active,27,12m+
+AG4029908,Herie Santander,TL-08,Arnel Vergara,2026-05-03,,Active,6,3-6m
+AG4029910,Grey Roncesvalles,TL-08,Arnel Vergara,2024-05-08,,Active,30,12m+
