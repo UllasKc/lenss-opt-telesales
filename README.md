@@ -79,6 +79,7 @@ Setup, prerequisites, giving people access, idle stop, cost and troubleshooting 
 | Document | For |
 |---|---|
 | [CHANGELOG.md](CHANGELOG.md) | Every change |
+| [docs/Command_Center_Walkthrough.md](docs/Command_Center_Walkthrough.md) | Presenters: every Command Center figure, chapter by chapter |
 | [docs/LensS_Optus_How_It_Works.png](docs/LensS_Optus_How_It_Works.png) | Leadership, clients |
 | [docs/LensS_Optus_Architecture.png](docs/LensS_Optus_Architecture.png) | Engineers, reviewers |
 | [docs/LensS_Optus_Agentic_Architecture.png](docs/LensS_Optus_Agentic_Architecture.png) | Architects, clients |
