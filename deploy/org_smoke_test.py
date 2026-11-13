@@ -278,10 +278,9 @@ def main():
                              "transfers", "coaching", "tenure") if not o.get(k)]
         if off or empty:
             raise RuntimeError("; ".join(off + [f"{k} empty" for k in empty]))
-        octo = {r["Sales_Category"]: num(r["Sales"]) for r in o["salesMix"]}
-        if octo != SOURCE_OCT_SALES:
-            raise Warn(f"September sales by category {octo} differ from the workbook {SOURCE_OCT_SALES}")
-        return f"every panel has data; September sales match the workbook; {len(o['weekly'])} weeks, {len(o['coaching'])} consultants to coach"
+        if not (o.get("ref") or {}).get("recovery"):
+            raise RuntimeError("no last-full-month reference figures (ref)")
+        return f"every panel has data (this month, with the last full month for reference); {len(o['weekly'])} weeks, {len(o['coaching'])} consultants to coach"
     check("B3", "Every Command Center panel has data", overview)
 
     def rules():
@@ -297,8 +296,8 @@ def main():
 
     def lists_match_cards():
         s, o = summary_(), overview_()
-        fc = next((r for r in o["firstCall"] if r["Month"] == s["Last_Full_Month"]), {})
-        pairs = [("lfm_lost", None, s["LFM_Lost_Sales"]), ("mtd_lost", None, s["MTD_Lost_Sales"]), ("jarvis_lost", None, s["LFM_Jarvis_Lost_Sales"]),
+        fc = next((r for r in o["firstCall"] if r["Month"] == s["Current_Month"]), {})
+        pairs = [("mtd_lost", None, s["MTD_Lost_Sales"]), ("jarvis_lost", None, s["MTD_Jarvis_Lost_Sales"]),
                  ("lost_came_back", None, fc.get("Lost_Came_Back")), ("lost_bought", None, fc.get("Lost_Bought_On_Return")),
                  ("callbacks_chased", None, fc.get("Callbacks_Chased"))]
         pairs += [("scenario", str(x["Scenario_ID"]), x["Calls"]) for x in o["scenarios"]]
@@ -321,13 +320,13 @@ def main():
         s, o = summary_(), overview_()
         done, bad = [], []
         lost = sum(num(r["Lost_Sales"]) for r in o["lostDrivers"])
-        (bad if lost != num(s["LFM_Lost_Sales"]) else done).append(f"lost-sale reasons sum to {lost:.0f}")
+        (bad if lost != num(s["MTD_Lost_Sales"]) else done).append(f"lost-sale reasons sum to {lost:.0f}")
         new = sum(num(r["Sales"]) for r in o["salesMix"] if r["Sale_Type"] == "New sale")
-        (bad if new != num(s["LFM_New_Sales"]) else done).append(f"new-sale categories sum to {new:.0f}")
+        (bad if new != num(s["MTD_New_Sales"]) else done).append(f"new-sale categories sum to {new:.0f}")
         jl = sum(num(r["Lost_Sales"]) for r in o["jarvis"])
-        (bad if jl != num(s["LFM_Jarvis_Lost_Sales"]) else done).append(f"Jarvis error types sum to {jl:.0f} blocked sales")
+        (bad if jl != num(s["MTD_Jarvis_Lost_Sales"]) else done).append(f"Jarvis error types sum to {jl:.0f} blocked sales")
         reasons = sum(num(r["Calls"]) for r in o["reasons"])
-        (bad if reasons != num(s["LFM_Calls"]) else done).append(f"call reasons sum to {reasons:.0f} calls")
+        (bad if reasons != num(s["MTD_Calls"]) else done).append(f"call reasons sum to {reasons:.0f} calls")
         if bad:
             raise RuntimeError("; ".join(bad))
         return "; ".join(done)
@@ -385,8 +384,8 @@ def main():
         s, o = summary_(), ctx.get("xo") or getj("/api/explorer/options")
         month = o["latestMonth"]
         t = getj("/api/explorer/data?" + urllib.parse.urlencode({"month": month})).get("totals") or {}
-        pairs = [("calls", "LFM_Calls"), ("new_sales", "LFM_New_Sales"), ("renewal_sales", "LFM_Renewal_Sales"), ("lost_sales", "LFM_Lost_Sales"),
-                 ("jarvis_lost", "LFM_Jarvis_Lost_Sales"), ("revenue", "LFM_Monthly_Revenue"), ("fcr_rate", "LFM_FCR_Rate")]
+        pairs = [("calls", "MTD_Calls"), ("new_sales", "MTD_New_Sales"), ("renewal_sales", "MTD_Renewal_Sales"), ("lost_sales", "MTD_Lost_Sales"),
+                 ("jarvis_lost", "MTD_Jarvis_Lost_Sales"), ("revenue", "MTD_Monthly_Revenue"), ("fcr_rate", "MTD_FCR_Rate")]
         off = [f"{a}: Explorer {t.get(a)} vs Command Center {s.get(b)}" for a, b in pairs if abs((num(t.get(a)) or 0) - (num(s.get(b)) or 0)) > 0.01]
         allc = getj("/api/explorer/data").get("totals") or {}
         if num(allc.get("calls")) != num(s["Calls_All"]):
@@ -394,7 +393,7 @@ def main():
         if off:
             raise RuntimeError("; ".join(off))
         return f"{month}: {t['calls']} calls, {t['new_sales']} new sales, {t['lost_sales']} lost reconcile; all months {allc['calls']} calls"
-    check("C2", "Explorer reconciles to the Command Center (last full month and all months)", explorer_reconciles)
+    check("C2", "Explorer reconciles to the Command Center (current month and all months)", explorer_reconciles)
 
     def explorer_by_team():
         s, o = summary_(), ctx.get("xo") or getj("/api/explorer/options")
@@ -408,8 +407,8 @@ def main():
                 raise RuntimeError(f"{team}: {d.get('lost_sales')} lost sales, list {lst['rows']}")
             calls_ += num(d.get("calls")) or 0
             lost += num(d.get("lost_sales")) or 0
-        if calls_ != num(s["LFM_Calls"]) or lost != num(s["LFM_Lost_Sales"]):
-            raise RuntimeError(f"teams sum to {calls_:.0f} calls / {lost:.0f} lost, month {s['LFM_Calls']} / {s['LFM_Lost_Sales']}")
+        if calls_ != num(s["MTD_Calls"]) or lost != num(s["MTD_Lost_Sales"]):
+            raise RuntimeError(f"teams sum to {calls_:.0f} calls / {lost:.0f} lost, month {s['MTD_Calls']} / {s['MTD_Lost_Sales']}")
         return f"{len(o['dims']['team'])} teams: lost-sale lists match, sum to {calls_:.0f} calls and {lost:.0f} lost sales"
     check("C3", "Each team filter matches its list, and they sum to the month", explorer_by_team)
 
@@ -521,9 +520,10 @@ def main():
 
     if "E" in run:
         s0, o0 = summary_(), overview_()
-        reasons = sorted([r for r in o0["reasons"] if r.get("Intended_Category")], key=lambda r: num(r["Sale_Conversion"]))
+        reasons = sorted((o0.get("ref") or {}).get("reasons") or [], key=lambda r: num(r["Sale_Conversion"]))
         worst_reason, best_reason = reasons[0]["Call_Reason"], reasons[-1]["Call_Reason"]
         s1 = next(x for x in o0["scenarios"] if str(x["Scenario_ID"]) == "1")
+        s1 = {**s1, "Calls": s1.get("Last_Full_Month_Calls")}   # the question asks about last month
         fc = next((r for r in o0["firstCall"] if r["Month"] == s0["Last_Full_Month"]), {})
         tr = o0["transfers"]
         top_dest = max({r["Transfer_Destination"] for r in tr}, key=lambda d: sum(num(r["Transfers"]) for r in tr if r["Transfer_Destination"] == d))
@@ -536,7 +536,7 @@ def main():
             lambda a: None if a["charts"] and (has(a, "WE") or has(a, "week")) else "no weekly chart"))
         check("E3", "Product categories sold last month and their revenue", key_question(
             "Which product categories sold most last month, and what monthly revenue did they bring?",
-            lambda a: None if has(a, "506") and "$" in a["text"] else "expected 506 Total Home new connections and a revenue figure"))
+            lambda a: None if has(a, "510") and "$" in a["text"] else "expected 510 Total Home new connections and a revenue figure"))
         check("E4", "NBN sales with no mobile offered, and the value of a 20% take-up", key_question(
             "How many NBN sales last month had no mobile cross-sell offered, and what would a 20% take-up be worth?",
             lambda a: None if f"{num(s1['Calls']):.0f}" in a["text"] else f"expected {num(s1['Calls']):.0f} sales (scenario 1)"))

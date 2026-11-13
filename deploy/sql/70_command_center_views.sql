@@ -40,6 +40,11 @@ SELECT
   SUM(CASE WHEN a.Is_MTD = 1 THEN a.Lost_Sale_Flag ELSE 0 END)                        AS MTD_Lost_Sales,
   1.0*SUM(CASE WHEN a.Is_MTD = 1 THEN a.FCR_Flag END)/NULLIF(COUNT(CASE WHEN a.Is_MTD = 1 THEN a.FCR_Flag END), 0) AS MTD_FCR_Unlocked,
   AVG(CASE WHEN a.Is_MTD = 1 THEN a.Handle_Time_Seconds END)                          AS MTD_Avg_Handle_Seconds,
+  MAX(date_format(a.As_Of_Date, 'yyyy-MM'))                                           AS Current_Month,
+  SUM(CASE WHEN a.Is_MTD = 1 THEN a.First_12M_Revenue ELSE 0 END)                     AS MTD_First_12M_Revenue,
+  1.0*SUM(CASE WHEN a.Is_MTD = 1 THEN a.Jarvis_Lost_Sale_Flag ELSE 0 END)/NULLIF(COUNT(CASE WHEN a.Is_MTD = 1 THEN 1 END), 0) AS MTD_Jarvis_Conversion_Impact,
+  1.0*SUM(CASE WHEN a.Is_MTD = 1 THEN a.FCR_Flag END)/NULLIF(COUNT(CASE WHEN a.Is_MTD = 1 THEN a.FCR_Flag END), 0) AS MTD_FCR_Rate,
+  1.0*SUM(CASE WHEN a.Is_MTD = 1 AND a.FCR_Flag IS NOT NULL THEN a.Transfer_Flag END)/NULLIF(COUNT(CASE WHEN a.Is_MTD = 1 THEN a.FCR_Flag END), 0) AS MTD_Transfer_Rate,
   -- The same days of the month before (a like-for-like comparison)
   1.0*SUM(CASE WHEN a.Month = a.Last_Full_Month AND day(a.Call_Date) <= a.Day_Of_Month THEN a.New_Sales ELSE 0 END)
      /NULLIF(COUNT(CASE WHEN a.Month = a.Last_Full_Month AND day(a.Call_Date) <= a.Day_Of_Month THEN 1 END), 0) AS Same_Days_Last_Month_New_Conversion,
@@ -92,4 +97,75 @@ SELECT * EXCEPT (rn) FROM (
   FROM {{catalog}}.{{prefix}}_gold.qry_agent_scorecard s
   WHERE s.Conversion_Quartile = 1
 ) WHERE rn <= {{live:top_agents}};
-COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_cc_coaching IS 'Answers: "Which consultants should we coach first?". The top_agents (10) consultants in the lowest conversion quartile over the last three full months, most sales below the median first, with every qry_agent_scorecard column (discovery score, cross-sell attempt rate, sales lost to people causes).';
+COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_cc_coaching IS 'Answers: "Which consultants should we coach first?". The top_agents (10) consultants in the lowest conversion quartile over the last three months to date, most sales below the median first, with every qry_agent_scorecard column (discovery score, cross-sell attempt rate, sales lost to people causes).';
+
+-- 3. The Command Center's month: the five scenarios and the recovery plan for the month to date.
+-- (qry_scenario_* and qry_recovery_plan stay on the last full month, which the Scenario Guide and the
+-- deploy checks use; these are the same rules on the month so far.)
+CREATE OR REPLACE VIEW {{catalog}}.{{prefix}}_gold.qry_cc_scenario_calls AS
+SELECT 1 AS Scenario_ID, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls
+ WHERE Is_MTD = 1 AND Sales_Category = 'Total Home - New Connection' AND Missed_Cross_Sell_Flag = 1
+UNION ALL SELECT 2, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_MTD = 1 AND Jarvis_Lost_Sale_Flag = 1
+UNION ALL SELECT 3, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_MTD = 1 AND Unresolved_Sales_First_Call_Flag = 1
+UNION ALL SELECT 4, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_MTD = 1 AND Avoidable_Transfer_Flag = 1
+UNION ALL SELECT 5, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_MTD = 1 AND Lost_Sale_Driver = 'Customer';
+COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_cc_scenario_calls IS 'The calls in each scenario (Scenario_ID 1 to 5) in the current month to date (October 2026 to the 20th), using the Scenario Guide rules. qry_scenario_calls holds the last full month.';
+
+CREATE OR REPLACE VIEW {{catalog}}.{{prefix}}_gold.qry_cc_scenarios AS
+WITH n AS (
+  SELECT s.Scenario_ID, COUNT(*) AS Calls, COUNT(DISTINCT c.Customer_ID) AS Customers, SUM(v.Avg_First_12M_Revenue) AS Value_If_Sold
+  FROM {{catalog}}.{{prefix}}_gold.qry_cc_scenario_calls s
+  JOIN {{catalog}}.{{prefix}}_gold.qry_calls c ON c.Call_ID = s.Call_ID
+  LEFT JOIN {{catalog}}.{{prefix}}_gold.qry_sale_value v ON v.Sales_Category = c.Intended_Category
+  GROUP BY s.Scenario_ID
+), t AS (
+  SELECT 1.0*SUM(CASE WHEN Cross_Sell_Outcome = 'Sold' THEN 1 ELSE 0 END)/NULLIF(SUM(COALESCE(Cross_Sell_Attempted_Flag, 0)), 0) AS Take_Up
+  FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Sales_Category = 'Total Home - New Connection'
+), mob AS (
+  SELECT Avg_First_12M_Revenue FROM {{catalog}}.{{prefix}}_gold.qry_sale_value WHERE Sales_Category = 'Postpaid Voice - New Connection'
+), cm AS (
+  SELECT MAX(date_format(As_Of_Date, 'yyyy-MM')) AS Month FROM {{catalog}}.{{prefix}}_gold.qry_calls
+)
+SELECT g.Scenario_ID, g.Scenario_Name, g.Business_Question, g.Filter_Logic, cm.Month, COALESCE(n.Calls, 0) AS Calls, n.Customers,
+       CASE g.Scenario_ID WHEN 1 THEN n.Calls * t.Take_Up * mob.Avg_First_12M_Revenue
+                          WHEN 4 THEN NULL ELSE n.Value_If_Sold END AS Est_First_12M_Value,
+       g.Value_Basis, g.Month AS Last_Full_Month, g.Calls AS Last_Full_Month_Calls
+FROM {{catalog}}.{{prefix}}_gold.qry_scenario_summary g
+LEFT JOIN n ON n.Scenario_ID = g.Scenario_ID CROSS JOIN t CROSS JOIN mob CROSS JOIN cm;
+COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_cc_scenarios IS 'Answers: "How many calls are in each scenario this month?". The five Scenario Guide scenarios in the current month to date (October 2026 to the 20th): calls, customers and estimated first-year value, with the last full month''s calls for reference (Last_Full_Month_Calls). The calls are in qry_cc_scenario_calls.';
+
+CREATE OR REPLACE VIEW {{catalog}}.{{prefix}}_gold.qry_cc_recovery AS
+WITH m AS (
+  SELECT COUNT(*) AS Calls, SUM(New_Sales) AS New_Sales, MAX(date_format(As_Of_Date, 'yyyy-MM')) AS Month
+  FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_MTD = 1
+), nv AS (
+  SELECT SUM(Avg_First_12M_Revenue * Sales)/SUM(Sales) AS New_Sale_Value FROM {{catalog}}.{{prefix}}_gold.qry_sale_value WHERE Sale_Type = 'New sale'
+), l AS (
+  SELECT
+    SUM(Jarvis_Lost_Sale_Flag) AS Jarvis_All, SUM(CASE WHEN Jarvis_Lost_Sale_Flag = 1 AND Intended_Sale_Type = 'New sale' THEN 1 ELSE 0 END) AS Jarvis_New,
+    SUM(CASE WHEN Lost_Sale_Driver = 'People' AND Intended_Sale_Type = 'New sale' THEN 1 ELSE 0 END) AS People_New,
+    SUM(Missed_Cross_Sell_Flag) AS Missed_Xsell
+  FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_MTD = 1
+), tk AS (
+  SELECT 1.0*SUM(CASE WHEN Cross_Sell_Outcome = 'Sold' THEN 1 ELSE 0 END)/NULLIF(SUM(COALESCE(Cross_Sell_Attempted_Flag, 0)), 0) AS Take_Up
+  FROM {{catalog}}.{{prefix}}_gold.qry_calls
+), base AS (
+  SELECT m.*, nv.New_Sale_Value, l.*, tk.Take_Up, r.target_new_conversion, r.people_recovery_share, r.xsell_full_attempt_share
+  FROM m CROSS JOIN nv CROSS JOIN l CROSS JOIN tk CROSS JOIN {{catalog}}.{{prefix}}_gold.qry_rules r
+)
+SELECT Month, 0 AS Lever_Order, 'Gap to target' AS Lever, 'Sales needed to reach the new sales conversion target so far this month' AS Detail, 'Telesales' AS Owner,
+       target_new_conversion * Calls - New_Sales AS New_Sales, (target_new_conversion * Calls - New_Sales) * New_Sale_Value AS Est_First_12M_Value,
+       CONCAT('Target ', CAST(ROUND(target_new_conversion*100, 1) AS STRING), '% x ', CAST(Calls AS STRING), ' calls, less ', CAST(New_Sales AS STRING), ' new sales') AS Basis
+FROM base
+UNION ALL
+SELECT Month, 1, 'Fix Jarvis order errors', 'New sales a Jarvis error stopped', 'IT / Optus', Jarvis_New, Jarvis_New * New_Sale_Value,
+       CONCAT(CAST(Jarvis_New AS STRING), ' new sales blocked (', CAST(Jarvis_All AS STRING), ' including renewals)') FROM base
+UNION ALL
+SELECT Month, 2, 'Offer mobile on every eligible sale', 'Cross-sell opportunities not offered x observed take-up', 'Training',
+       Missed_Xsell * xsell_full_attempt_share * Take_Up, Missed_Xsell * xsell_full_attempt_share * Take_Up * New_Sale_Value,
+       CONCAT(CAST(Missed_Xsell AS STRING), ' not offered x ', CAST(ROUND(Take_Up*100, 0) AS STRING), '% take-up when offered') FROM base
+UNION ALL
+SELECT Month, 3, 'Coach discovery and ownership', 'New sales lost to people causes x recovery share', 'Team leads',
+       People_New * people_recovery_share, People_New * people_recovery_share * New_Sale_Value,
+       CONCAT(CAST(People_New AS STRING), ' new sales lost to people causes x ', CAST(ROUND(people_recovery_share*100, 0) AS STRING), '% assumed recovered') FROM base;
+COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_cc_recovery IS 'Answers: "How do we close the gap to target this month?". The same rules as qry_recovery_plan on the current month to date (October 2026 to the 20th): the gap in new sales to the new sales conversion target so far (Lever_Order 0) and what fixing Jarvis, offering the cross-sell on every eligible sale and coaching discovery and ownership would have added. Planning estimates, not forecasts.';

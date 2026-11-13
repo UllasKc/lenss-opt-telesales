@@ -259,10 +259,11 @@ LEFT JOIN au ON au.Month = c.Month AND au.Agent_ID = c.Agent_ID
 GROUP BY c.Month, c.Agent_ID, a.Agent_Name, c.Team_Lead;
 COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_agent_month IS 'Answers: "How is each consultant doing?". Per month and consultant (real consultant names, synthetic team lead names; performance synthetic): calls, sale calls, new and renewal sales and conversion, revenue, lost sales (and those lost to people causes), cross-sell opportunities and attempts, FCR, transfers and avoidable transfers, callbacks promised, handle time, and their Elevate audits (count, average discovery score out of 5, average audit score, audits with discovery 2 or less).';
 
--- 13. Consultant scorecard over the last three full months (who to coach first).
+-- 13. Consultant scorecard over the last three months to date (who to coach first).
 CREATE OR REPLACE VIEW {{catalog}}.{{prefix}}_gold.qry_agent_scorecard AS
 WITH w AS (
-  SELECT Last_Full_Month, date_format(add_months(to_date(CONCAT(Last_Full_Month, '-01')), -2), 'yyyy-MM') AS Window_Start
+  SELECT date_format(As_Of_Date, 'yyyy-MM') AS Window_End,
+         date_format(add_months(trunc(As_Of_Date, 'MM'), -2), 'yyyy-MM') AS Window_Start
   FROM {{catalog}}.{{prefix}}_gold.qry_calls LIMIT 1
 ), m AS (
   SELECT g.Agent_ID, MAX(g.Agent_Name) AS Agent_Name, MAX(g.Team_Lead) AS Team_Lead, MAX(g.Tenure_Band) AS Tenure_Band,
@@ -274,7 +275,7 @@ WITH w AS (
          SUM(g.Avg_Discovery_Score * g.Audits)/NULLIF(SUM(g.Audits), 0) AS Avg_Discovery_Score,
          SUM(g.Low_Discovery_Audits) AS Low_Discovery_Audits
   FROM {{catalog}}.{{prefix}}_gold.qry_agent_month g CROSS JOIN w
-  WHERE g.Month BETWEEN w.Window_Start AND w.Last_Full_Month
+  WHERE g.Month BETWEEN w.Window_Start AND w.Window_End
   GROUP BY g.Agent_ID
 ), ranked AS (
   SELECT m.*, r.min_agent_calls, r.low_discovery_score,
@@ -282,7 +283,7 @@ WITH w AS (
          percentile(m.Sale_Conversion, 0.5) OVER () AS Median_Sale_Conversion
   FROM m CROSS JOIN {{catalog}}.{{prefix}}_gold.qry_rules r
 )
-SELECT w.Window_Start, w.Last_Full_Month AS Window_End,
+SELECT w.Window_Start, w.Window_End,
        ranked.Agent_ID, ranked.Agent_Name, ranked.Team_Lead, ranked.Tenure_Band, ranked.Calls, ranked.Sale_Calls, ranked.New_Sales,
        ranked.Sale_Conversion, ranked.New_Conversion, ranked.Lost_People, ranked.Cross_Sell_Opportunities, ranked.Cross_Sell_Attempt_Rate,
        ranked.Avoidable_Transfers, ranked.Audits, ranked.Avg_Discovery_Score, ranked.Low_Discovery_Audits,
@@ -293,7 +294,7 @@ SELECT w.Window_Start, w.Last_Full_Month AS Window_End,
             WHEN Cross_Sell_Attempt_Rate < 0.15 THEN 'Coach: cross-sell'
             WHEN Conversion_Quartile = 4 THEN 'Top performer' ELSE 'On track' END AS Coaching_Focus
 FROM ranked CROSS JOIN w;
-COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_agent_scorecard IS 'Answers: "Which consultants should we coach first?" and "Who are our top performers?". One row per consultant over the last three full months (Window_Start to Window_End): calls, sale conversion and its quartile among consultants with at least min_agent_calls calls (1 = lowest), new sales, sales lost to people causes, cross-sell attempt rate, avoidable transfers and Elevate discovery score (out of 5). Sales_Below_Median: extra sale calls if the consultant converted at the median. Coaching_Focus is a rule, not a judgement on the person.';
+COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_agent_scorecard IS 'Answers: "Which consultants should we coach first?" and "Who are our top performers?". One row per consultant over the last three months to date (Window_Start to Window_End: August to 20 October 2026): calls, sale conversion and its quartile among consultants with at least min_agent_calls calls (1 = lowest), new sales, sales lost to people causes, cross-sell attempt rate, avoidable transfers and Elevate discovery score (out of 5). Sales_Below_Median: extra sale calls if the consultant converted at the median. Coaching_Focus is a rule, not a judgement on the person.';
 
 -- 14. Team leads by month.
 CREATE OR REPLACE VIEW {{catalog}}.{{prefix}}_gold.qry_team_month AS

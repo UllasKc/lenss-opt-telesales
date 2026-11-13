@@ -9,7 +9,8 @@
   "lakebase_project": "lenss-collections-app",
   "lakebase_database": "chatapp-telesales",
   "app_name": "lenss-optus-telesales",
-  "readers_group": "lenss-collections-readers",
+  "readers_group": "lenss-optus-tele-readers",
+  "demo_givers_group": "lenss-optus-tele-demo-givers",
   "semantic_cache": { "threshold": 98, "embedding_model": "databricks-gte-large-en" },
   "guardrails": {
     "model": "databricks-meta-llama-3-3-70b-instruct",

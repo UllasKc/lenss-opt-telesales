@@ -14,7 +14,7 @@ export interface Suggestion {
 export const STARTERS: Suggestion[] = [
   { mode: 'chat', label: 'Yesterday, and our pace to target', q: 'How did we do yesterday, and are we on pace for target this month?' },
   { mode: 'chat', label: 'Weekly conversion by product', q: 'Show weekly conversion for Postpaid Voice and Home new connections over the last 8 weeks.' },
-  { mode: 'chat', label: 'Calls in each scenario', q: 'How many calls are in each scenario last month?' },
+  { mode: 'chat', label: 'Calls in each scenario', q: 'How many calls are in each scenario this month?' },
   { mode: 'agent', label: 'Why are we behind target?', q: 'We are behind the new sales conversion target. Why, and what should we fix first?' },
   { mode: 'agent', label: 'Why does mobile convert less than NBN?', q: 'Why does mobile convert so much less than NBN, and what should we change on mobile calls?' },
   { mode: 'agent', label: 'Who should we coach first?', q: 'Which consultants should we coach first, and on what: discovery, ownership or cross-sell?' },
@@ -22,7 +22,7 @@ export const STARTERS: Suggestion[] = [
 
 export const MORE_SUGGESTIONS: Suggestion[] = [
   { mode: 'chat', label: 'Sales lost to Jarvis', q: 'How many sales were lost to Jarvis errors this month, and what is the conversion impact in points?' },
-  { mode: 'chat', label: 'NBN sales with no mobile offer', q: 'How many NBN sales last month had no mobile cross-sell offered, and what would a 20% take-up be worth?' },
+  { mode: 'chat', label: 'NBN sales with no mobile offer', q: 'How many NBN sales this month had no mobile cross-sell offered, and what would a 20% take-up be worth?' },
   { mode: 'agent', label: 'Do lost customers come back?', q: 'Do customers we lose come back and buy? What should consultants do differently on the first call?' },
   { mode: 'agent', label: 'How do we close the gap?', q: 'How do we close the gap to the new sales conversion target? Rank the levers and say who owns each.' },
 ];
@@ -39,9 +39,9 @@ export const QUICK_START: QuickStart[] = [
   { icon: 'gap', category: 'Performance', title: 'Why we are behind target', desc: 'The gap, where sales are lost, what to fix first', mode: 'agent',
     q: 'We are behind the new sales conversion target. Why, and what should we fix first?' },
   { icon: 'alert', category: 'Systems', title: 'What Jarvis is costing us', desc: 'Blocked sales, error types and ticket times', mode: 'agent',
-    q: 'How many sales did Jarvis errors cost last month, which errors matter most, and how long do tickets take?' },
+    q: 'How many sales did Jarvis errors cost this month, which errors matter most, and how long do tickets take?' },
   { icon: 'cash', category: 'Cross-sell', title: 'The mobile sale on NBN calls', desc: 'Opportunities not offered, take-up, value', mode: 'agent',
-    q: 'How many NBN sales last month had no mobile cross-sell offered, and what would offering it every time be worth?' },
+    q: 'How many NBN sales this month had no mobile cross-sell offered, and what would offering it every time be worth?' },
   { icon: 'promise', category: 'First call', title: 'Lost on the first call', desc: 'Lost sales, callbacks and repeat calls', mode: 'agent',
     q: 'Do customers we lose come back and buy? Are promised callbacks being kept?' },
   { icon: 'shield', category: 'Coaching', title: 'Who to coach first', desc: 'Lowest converters, discovery scores, cross-sell', mode: 'agent',
@@ -60,8 +60,8 @@ export const LIBRARY: Array<{ category: string; items: Array<{ q: string; tag: s
   ] },
   { category: 'Sales', items: [
     { q: 'Show weekly conversion for Postpaid Voice and Home new connections over the last 8 weeks.', tag: 'weekly', mode: 'chat' },
-    { q: 'Which product categories sold most last month, and what monthly revenue did they bring?', tag: 'mix', mode: 'chat' },
-    { q: 'Which call reasons convert best and worst last month?', tag: 'call reasons', mode: 'chat' },
+    { q: 'Which product categories sold most this month, and what monthly revenue did they bring?', tag: 'mix', mode: 'chat' },
+    { q: 'Which call reasons convert best and worst this month?', tag: 'call reasons', mode: 'chat' },
     { q: 'Break down lost sales by driver (Customer, People, System) and reason.', tag: 'lost sales', mode: 'chat' },
   ] },
   { category: 'Systems and process', items: [

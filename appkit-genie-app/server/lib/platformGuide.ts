@@ -21,7 +21,7 @@ The answers come from the **LensS Intelligence Engine**, which turns a question 
     id: 'command-center', title: 'Command Center tab',
     keywords: ['command center', 'command centre', 'home', 'dashboard', 'first page', 'overview', 'kpi', 'metrics', 'summary', 'chapters', 'scenarios', 'scenario', 'trend', 'view calls', 'calls behind', 'recovery plan', 'pace'],
     text: `The **Command Center** is the one-minute view of Optus telesales, told as one story in seven chapters (the bar under the summary jumps to each):
-- **1 · Today (the top banner):** the month so far against the new sales conversion target, the pace to the end of the month, and four tiles: the latest day (against the same day last week), sales this month, lost sales this month and FCR this month (unlocked). Below the summary, the last full month: conversion, renewals, plan revenue and FCR, weekly conversion by product, daily conversion, and what was sold by Optus's five categories.
+- **1 · Today (the top banner):** the month so far against the new sales conversion target, the pace to the end of the month, and four tiles: sales this month, the target (with how many more new sales the rest of the month needs), lost sales this month and FCR this month. Every chapter shows the current month to date (October to the 20th), with the last full month (September) in small reference lines. Below the summary: conversion, renewals, plan revenue and FCR, weekly conversion by product, daily conversion, and what was sold by Optus's five categories.
 - **Executive summary:** "The month in 30 seconds", one line per chapter and a bottom line; each line jumps to its chapter.
 - **2 · Where sales are lost:** which call reasons turn into sales (mobile against NBN), and why customers who wanted to buy didn't (Customer, People, System).
 - **3 · Jarvis:** sales stopped by Jarvis errors by error type, ticket resolution days, and the month-by-month trend.
@@ -36,14 +36,14 @@ Every panel has an **Ask LensS** button; hover over it to see the exact question
     id: 'explorer', title: 'Explorer tab',
     keywords: ['explorer', 'filter', 'filters', 'drill', 'drill down', 'slice', 'slicer', 'why', 'state', 'product', 'month', 'team', 'call reason', 'call result', 'export', 'csv', 'download data', 'calls list', 'records', 'segment', 'heatmap'],
     text: `The **Explorer** answers "why": it slices the same governed data by any combination of filters.
-- **Filters:** month (or all months), team lead, product interest, call reason, sales category, consultant tenure, state, customer type, call direction, call result, lost-sale driver and FCR outcome. It opens on the last full month. Active filters show as chips; click a chip's × to remove it, or **Reset filters** (back to the last full month).
+- **Filters:** month (or all months), team lead, product interest, call reason, sales category, consultant tenure, state, customer type, call direction, call result, lost-sale driver and FCR outcome. It opens on the current month to date. Active filters show as chips; click a chip's × to remove it, or **Reset filters** (back to the last full month).
 - **Headline tiles** show the filtered figures (calls, new sales, new sales conversion, calls that closed a sale, plan revenue, lost sales, FCR, transfers, cross-sell offered, handle time), compared with all calls in the same period.
 - **Analytical exploration workspace:** pick a dimension and a measure to compare, as bars or a table. **Click any bar to filter the whole page to it** (drill-down).
 - **Two dimensions at once:** a heatmap of any two dimensions (team by product by default), coloured against the view's overall figure; click a cell to see its calls.
 - **Sales and FCR outcomes** by the chosen dimension, **lost sales by driver** and the **monthly trend of this view** follow the filters (the trend ignores the month filter).
 - **Call records:** the calls in the current view (sales and lost sales first), with search, sort and paging. **Export CSV** downloads them. **View** on any item opens its calls.
 - **Ask LensS about this view** asks why the filtered slice differs from the rest; every panel's question carries the active filters.
-With the last full month and no other filter, every Explorer figure reconciles exactly to the Command Center.`,
+With the current month and no other filter, every Explorer figure reconciles exactly to the Command Center.`,
   },
   {
     id: 'assistant', title: 'Assistant tab',
@@ -114,8 +114,8 @@ With the last full month and no other filter, every Explorer figure reconciles e
     id: 'data', title: 'What data LensS uses',
     keywords: ['data', 'as of', 'date', 'month', 'months', 'refresh', 'updated', 'latest day', 'currency', 'dollars', 'aud', 'tables', 'views', 'definitions', 'kpi definitions', 'scenario guide', 'synthetic', 'real data'],
     text: `- **Data:** synthetic Optus telesales demo data, about 182,000 handled calls from 1 November 2025 to Tuesday 20 October 2026, with the sales made on them (Optus's five categories: Postpaid Voice and Total Home new connections, Connected Devices, Postpaid Voice and Home renewals), plan prices, consultants and team leads (real consultant names, synthetic team lead names; all figures synthetic), Elevate quality audits and FCR audits. It is shaped to Optus's sales and the Concentrix FCR and conversion slides. Amounts are in Australian dollars.
-- **Latest day** ("today") means 20 October 2026, with 11 days left in the month; **this month** means October so far; **last month** means September 2026, the last full month.
-- **Conversion** is sales ÷ handled calls. **FCR** is answered calls not transferred and not repeated within 14 days; calls in the last 14 days are unlocked.
+- **Latest day** ("today") means 20 October 2026, with 11 days left in the month; **this month** means October so far; **last month** means September 2026, the last full month (shown on the Command Center as a reference).
+- **Conversion** is sales ÷ handled calls. **FCR** is answered calls not transferred and not repeated within 14 days.
 - **Definitions** of every figure are in **KPI definitions** on the Command Center.
 - The dashboards and the Assistant use the same certified views, so their figures agree.`,
   },

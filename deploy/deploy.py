@@ -8,7 +8,7 @@ Creates/updates, idempotently and in order:
   ingest     uploads the telesales workbook, lands its 11 sheets as bronze/context tables
   context    governance tables that are not in the workbook (SQL controls, known limits)
   transform  silver typed tables, gold rules, 20 certified views, 1 metric view
-  views      the Command Center views (qry_cc_kpis, qry_cc_coaching)
+  views      the Command Center views (qry_cc_kpis, qry_cc_coaching, qry_cc_scenarios, qry_cc_recovery)
   summary    writes the Command Center's executive summary to gold.exec_summary (no LLM)
   genie      Genie space: sources, instructions, examples, benchmarks
   lakebase   Postgres project/database + chat-history/usage schema
@@ -1275,7 +1275,7 @@ def step_org_smoke(db: Databricks, sql: Sql, cfg: dict, state: dict, cfg_path: P
                     "qry_monthly_trend", "qry_sales_mix", "qry_reason_conversion", "qry_lost_sales", "qry_jarvis_impact", "qry_cross_sell",
                     "qry_first_call", "qry_transfers", "qry_agent_month", "qry_agent_scorecard", "qry_team_month", "qry_scenario_calls",
                     "qry_scenario_summary", "qry_recovery_plan", "qry_elevate_audits", "qry_fcr_audits", "qry_product_catalog",
-                    "qry_cc_kpis", "qry_cc_coaching", "exec_summary"}
+                    "qry_cc_kpis", "qry_cc_coaching", "qry_cc_scenario_calls", "qry_cc_scenarios", "qry_cc_recovery", "exec_summary"}
         absent = sorted(expected - names)
         if absent or missing:
             raise RuntimeError(f"missing objects {absent}; without a description {missing}")

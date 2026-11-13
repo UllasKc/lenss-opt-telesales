@@ -1517,3 +1517,6 @@ h2.sect::before{content:"";width:3px;height:12px;border-radius:2px;background:va
 .gap-stack{height:22px;margin-bottom:14px;opacity:.85}
 .gap-stack span{justify-content:start;padding-left:10px}
 .flat-grid{gap:4px 22px}
+
+/* A small reference line: the last full month, for comparison */
+.ref-line{display:block;font:500 11.5px var(--body);color:var(--muted);margin-top:3px;letter-spacing:0;text-transform:none}

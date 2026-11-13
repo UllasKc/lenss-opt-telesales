@@ -84,6 +84,8 @@ SCENARIOS (the Scenario Guide; counts are for the last full month in qry_scenari
 4. Avoidable Transfers: Transfer_Valid_Flag = 0.
 5. Customer Eligibility Blockers: Lost_Sale_Driver = Customer (credit check, ID verification, port-in account number).
 The calls in each scenario are in qry_scenario_calls (join qry_calls on Call_ID).
+The Command Center shows the scenarios and the recovery plan for this month (Is_MTD = 1): for a scenario count
+or the gap to target "this month", apply the same rules to qry_calls WHERE Is_MTD = 1.
 
 WHICH VIEW ANSWERS WHICH QUESTION (prefer these; each view's description says more)
 - Headline, yesterday, month to date, pace to target, last full month: qry_cc_kpis.
@@ -96,7 +98,7 @@ WHICH VIEW ANSWERS WHICH QUESTION (prefer these; each view's description says mo
 - Cross-sell opportunities, attempts and take-up by team and consultant: qry_cross_sell.
 - Lost customers who came back, promised callbacks, first vs repeat contact conversion: qry_first_call.
 - Transfers by destination and whether avoidable: qry_transfers.
-- Consultants: qry_agent_month (monthly), qry_agent_scorecard (last three full months, coaching focus),
+- Consultants: qry_agent_month (monthly), qry_agent_scorecard (last three months to date, coaching focus),
   qry_cc_coaching (who to coach first). Teams: qry_team_month.
 - Scenarios: qry_scenario_summary and qry_scenario_calls. Closing the gap to target: qry_recovery_plan.
 - Quality audits: qry_elevate_audits; FCR audits: qry_fcr_audits.

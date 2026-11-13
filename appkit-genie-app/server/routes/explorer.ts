@@ -96,8 +96,8 @@ export function buildExplorerRouter(db: Lakebase): express.Router {
       runSql(`SELECT ${d.col()} AS v FROM ${BASE} WHERE ${d.col()} IS NOT NULL GROUP BY ${d.col()} ORDER BY ${d.order ?? d.col()}`)
         .then((rows) => [k, rows.map((r) => String(r.v))] as const)));
     for (const [k, v] of lists) dims[k] = v;
-    // The Explorer opens on the last full month (the Command Center's chapters).
-    const [l] = await runSql(`SELECT MAX(Last_Full_Month) AS m FROM ${BASE}`);
+    // The Explorer opens on the current month to date (the Command Center's chapters).
+    const [l] = await runSql(`SELECT MAX(date_format(As_Of_Date, 'yyyy-MM')) AS m FROM ${BASE}`);
     return { dims, latestMonth: l?.m ?? null };
   });
 

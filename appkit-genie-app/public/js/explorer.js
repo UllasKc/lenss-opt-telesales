@@ -112,7 +112,7 @@
     const el = e.target.closest('[data-f]');
     if (el && el.tagName === 'SELECT') setFilter(el.dataset.f, el.value);
   });
-  /** Reset keeps the last full month, so the page reconciles to the Command Center. */
+  /** Reset keeps the current month, so the page reconciles to the Command Center. */
   const resetFilters = () => { state.filters = state.options?.latestMonth ? { month: state.options.latestMonth } : {}; };
   document.getElementById('xpReset').addEventListener('click', () => { resetFilters(); state.page = 0; state.search = ''; remember(); buildSelects(); load(); });
   document.getElementById('xpExport').addEventListener('click', exportCsv);
@@ -496,7 +496,7 @@
       for (const k of Object.keys(state.filters)) {
         if (!DIM_LABEL[k] || !(state.options.dims[k] || []).includes(state.filters[k])) delete state.filters[k];
       }
-      // First visit: the last full month, so the Explorer opens on the same figures as the Command Center.
+      // First visit: the current month to date, so the Explorer opens on the same figures as the Command Center.
       let firstVisit = true;
       try { firstVisit = !localStorage.getItem('lenss.optus.telesales.explorer'); } catch { /* storage blocked: treat as a first visit */ }
       if (firstVisit && state.options.latestMonth) state.filters.month = state.options.latestMonth;

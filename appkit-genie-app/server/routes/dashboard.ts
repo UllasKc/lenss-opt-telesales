@@ -76,8 +76,10 @@ export function buildDashboardRouter(db: Lakebase): express.Router {
    * Everything the Command Center shows beyond the headline, in one round trip:
    * each panel is a certified-view query (no AI), run in parallel and cached per
    * data version like the rest. A panel that fails comes back empty rather than
-   * failing the page. "LFM" is the last full month.
+   * failing the page. The Command Center's month is the current month to date ("CM"); the last
+   * full month ("LFM") comes back in `ref`, for the small comparison lines.
    */
+  const CM = `(SELECT Current_Month FROM ${GOLD}.qry_cc_kpis)`;
   const LFM = `(SELECT Last_Full_Month FROM ${GOLD}.qry_cc_kpis)`;
   const computeOverview = async () => {
     const q = (sql: string) => runSql(sql).catch((err) => {
@@ -85,48 +87,59 @@ export function buildDashboardRouter(db: Lakebase): express.Router {
       return [] as Record<string, string | null>[];
     });
     const [daily, weekly, monthly, salesMix, reasons, lostDrivers, jarvis, xsellTeams, xsellCats, firstCall, transfers,
-      scenarios, recovery, coaching, tenure, saleValue] = await Promise.all([
+      scenarios, recovery, coaching, tenure, saleValue, refReasons, refDrivers, refXsell, refTransfers, refRecovery] = await Promise.all([
       q(`SELECT *, CAST(Call_Date AS STRING) AS d FROM ${GOLD}.qry_daily_kpis
            WHERE Call_Date > date_sub((SELECT As_Of_Date FROM ${GOLD}.qry_cc_kpis), 42) ORDER BY Call_Date`),
       q(`SELECT *, CAST(Week_Ending AS STRING) AS we FROM ${GOLD}.qry_weekly_kpis ORDER BY Week_Ending`),
       q(`SELECT * FROM ${GOLD}.qry_monthly_trend ORDER BY Month`),
       q(`SELECT Sales_Category, Sale_Type, SUM(Sales) AS Sales, SUM(Cross_Sell_Sales) AS Cross_Sell_Sales, SUM(Monthly_Revenue) AS Monthly_Revenue,
-                SUM(First_12M_Revenue) AS First_12M_Revenue FROM ${GOLD}.qry_sales_mix WHERE Month = ${LFM}
+                SUM(First_12M_Revenue) AS First_12M_Revenue FROM ${GOLD}.qry_sales_mix WHERE Month = ${CM}
            GROUP BY Sales_Category, Sale_Type ORDER BY Sales DESC`),
       q(`SELECT Call_Reason, Reason_Group, Intended_Category, SUM(Calls) AS Calls, SUM(Sale_Calls) AS Sale_Calls,
                 1.0*SUM(Sale_Calls)/SUM(Calls) AS Sale_Conversion, SUM(Lost_Sales) AS Lost_Sales, SUM(Lost_People) AS Lost_People,
                 SUM(Lost_Customer) AS Lost_Customer, SUM(Lost_System) AS Lost_System,
                 SUM(Transfers) AS Transfers
-           FROM ${GOLD}.qry_reason_conversion WHERE Month = ${LFM} GROUP BY Call_Reason, Reason_Group, Intended_Category ORDER BY Calls DESC`),
+           FROM ${GOLD}.qry_reason_conversion WHERE Month = ${CM} GROUP BY Call_Reason, Reason_Group, Intended_Category ORDER BY Calls DESC`),
       q(`SELECT Lost_Sale_Driver, Lost_Sale_Reason, SUM(Lost_Sales) AS Lost_Sales, SUM(Came_Back) AS Came_Back,
                 SUM(Bought_On_Return) AS Bought_On_Return, SUM(Est_First_12M_Value_Lost) AS Value_Lost
-           FROM ${GOLD}.qry_lost_sales WHERE Month = ${LFM} GROUP BY Lost_Sale_Driver, Lost_Sale_Reason ORDER BY Lost_Sales DESC`),
+           FROM ${GOLD}.qry_lost_sales WHERE Month = ${CM} GROUP BY Lost_Sale_Driver, Lost_Sale_Reason ORDER BY Lost_Sales DESC`),
       q(`SELECT Jarvis_Error_Type, SUM(Error_Calls) AS Error_Calls, SUM(Lost_Sales) AS Lost_Sales, SUM(Sold_Despite_Error) AS Sold_Despite_Error,
                 SUM(Tickets) AS Tickets, SUM(Avg_Resolution_Days*Tickets)/NULLIF(SUM(Tickets),0) AS Avg_Resolution_Days,
                 MAX(Max_Resolution_Days) AS Max_Resolution_Days, SUM(Tickets_Over_5_Days) AS Tickets_Over_5_Days,
                 SUM(Avg_Handle_Seconds*Error_Calls)/SUM(Error_Calls) AS Avg_Handle_Seconds, SUM(Lost_Came_Back) AS Lost_Came_Back,
                 SUM(Lost_Bought_On_Return) AS Lost_Bought_On_Return, SUM(Est_First_12M_Value_Lost) AS Value_Lost
-           FROM ${GOLD}.qry_jarvis_impact WHERE Month = ${LFM} GROUP BY Jarvis_Error_Type ORDER BY Lost_Sales DESC`),
+           FROM ${GOLD}.qry_jarvis_impact WHERE Month = ${CM} GROUP BY Jarvis_Error_Type ORDER BY Lost_Sales DESC`),
       q(`SELECT Team_Lead, SUM(Opportunities) AS Opportunities, SUM(Attempted) AS Attempted, SUM(Not_Offered) AS Not_Offered,
                 SUM(Sold) AS Sold, 1.0*SUM(Attempted)/NULLIF(SUM(Opportunities),0) AS Attempt_Rate
-           FROM ${GOLD}.qry_cross_sell WHERE Month = ${LFM} GROUP BY Team_Lead ORDER BY Attempt_Rate`),
+           FROM ${GOLD}.qry_cross_sell WHERE Month = ${CM} GROUP BY Team_Lead ORDER BY Attempt_Rate`),
       q(`SELECT Sales_Category, Cross_Sell_Product, SUM(Sale_Calls) AS Sale_Calls, SUM(Opportunities) AS Opportunities, SUM(Attempted) AS Attempted,
                 SUM(Not_Offered) AS Not_Offered, SUM(Sold) AS Sold, SUM(Declined) AS Declined
-           FROM ${GOLD}.qry_cross_sell WHERE Month = ${LFM} GROUP BY Sales_Category, Cross_Sell_Product ORDER BY Opportunities DESC`),
+           FROM ${GOLD}.qry_cross_sell WHERE Month = ${CM} GROUP BY Sales_Category, Cross_Sell_Product ORDER BY Opportunities DESC`),
       q(`SELECT * FROM ${GOLD}.qry_first_call ORDER BY Month`),
       q(`SELECT Transfer_Destination, Transfer_Validity, Invalid_Transfer_Reason, Call_Type, SUM(Transfers) AS Transfers
-           FROM ${GOLD}.qry_transfers WHERE Month = ${LFM} GROUP BY Transfer_Destination, Transfer_Validity, Invalid_Transfer_Reason, Call_Type`),
-      q(`SELECT * FROM ${GOLD}.qry_scenario_summary ORDER BY Scenario_ID`),
-      q(`SELECT * FROM ${GOLD}.qry_recovery_plan ORDER BY Lever_Order`),
+           FROM ${GOLD}.qry_transfers WHERE Month = ${CM} GROUP BY Transfer_Destination, Transfer_Validity, Invalid_Transfer_Reason, Call_Type`),
+      q(`SELECT * FROM ${GOLD}.qry_cc_scenarios ORDER BY Scenario_ID`),
+      q(`SELECT * FROM ${GOLD}.qry_cc_recovery ORDER BY Lever_Order`),
       q(`SELECT * FROM ${GOLD}.qry_cc_coaching ORDER BY Sales_Below_Median DESC`),
       q(`SELECT Tenure_Band, COUNT(*) AS Calls, 1.0*SUM(Sale_Flag)/COUNT(*) AS Sale_Conversion, 1.0*SUM(New_Sales)/COUNT(*) AS New_Conversion,
                 MIN(Agent_Tenure_Months) AS ord
-           FROM ${GOLD}.qry_calls WHERE Month BETWEEN (SELECT MIN(Window_Start) FROM ${GOLD}.qry_agent_scorecard) AND ${LFM}
+           FROM ${GOLD}.qry_calls WHERE Month BETWEEN (SELECT MIN(Window_Start) FROM ${GOLD}.qry_agent_scorecard)
+                                        AND (SELECT MAX(Window_End) FROM ${GOLD}.qry_agent_scorecard)
            GROUP BY Tenure_Band ORDER BY ord`),
       q(`SELECT * FROM ${GOLD}.qry_sale_value`),
+      // The last full month, for the small "September: ..." reference lines
+      q(`SELECT Call_Reason, 1.0*SUM(Sale_Calls)/SUM(Calls) AS Sale_Conversion, SUM(Calls) AS Calls
+           FROM ${GOLD}.qry_reason_conversion WHERE Month = ${LFM} AND Intended_Category IS NOT NULL GROUP BY Call_Reason`),
+      q(`SELECT Lost_Sale_Driver, SUM(Lost_Sales) AS Lost_Sales FROM ${GOLD}.qry_lost_sales WHERE Month = ${LFM} GROUP BY Lost_Sale_Driver`),
+      q(`SELECT SUM(Sale_Calls) AS Sale_Calls, SUM(Opportunities) AS Opportunities, SUM(Attempted) AS Attempted, SUM(Not_Offered) AS Not_Offered, SUM(Sold) AS Sold
+           FROM ${GOLD}.qry_cross_sell WHERE Month = ${LFM} AND Sales_Category = 'Total Home - New Connection'`),
+      q(`SELECT SUM(Transfers) AS Transfers, SUM(CASE WHEN Transfer_Validity = 'Avoidable' THEN Transfers ELSE 0 END) AS Avoidable
+           FROM ${GOLD}.qry_transfers WHERE Month = ${LFM}`),
+      q(`SELECT * FROM ${GOLD}.qry_recovery_plan ORDER BY Lever_Order`),
     ]);
+    const ref = { reasons: refReasons, drivers: refDrivers, xsell: refXsell[0] ?? {}, transfers: refTransfers[0] ?? {}, recovery: refRecovery };
     return { daily, weekly, monthly, salesMix, reasons, lostDrivers, jarvis, xsellTeams, xsellCats, firstCall, transfers,
-      scenarios, recovery, coaching, tenure, saleValue };
+      scenarios, recovery, coaching, tenure, saleValue, ref };
   };
   router.get('/api/dashboard/overview', (_req, res) => cached('overview', res, computeOverview));
 
@@ -137,14 +150,12 @@ export function buildDashboardRouter(db: Lakebase): express.Router {
    * reason, a Jarvis error type, a call reason, a transfer destination, a team or a consultant),
    * checked against the data.
    */
-  const L = 'b.Is_Last_Full_Month = 1';
+  const L = 'b.Is_MTD = 1';   // the Command Center's month: the current month to date
   type Needs = 'scenario' | 'driver' | 'reason' | 'jarvis' | 'callreason' | 'destination' | 'team' | 'agent';
   const LISTS: Record<string, { where: (v: string) => string; order: string; needs?: Needs }> = {
     day_sales: { where: () => 'b.Is_Latest_Day = 1 AND b.Sale_Flag = 1', order: 'b.Call_Start_Datetime DESC' },
     mtd_sales: { where: () => 'b.Is_MTD = 1 AND b.Sale_Flag = 1', order: 'b.Call_Start_Datetime DESC' },
     mtd_lost: { where: () => 'b.Is_MTD = 1 AND b.Lost_Sale_Flag = 1', order: 'b.Call_Start_Datetime DESC' },
-    lfm_sales: { where: () => `${L} AND b.Sale_Flag = 1`, order: 'b.Monthly_Revenue DESC' },
-    lfm_lost: { where: () => `${L} AND b.Lost_Sale_Flag = 1`, order: 'b.Call_Start_Datetime DESC' },
     driver: { where: (v) => `${L} AND b.Lost_Sale_Driver = ${v}`, order: 'b.Call_Start_Datetime DESC', needs: 'driver' },
     reason: { where: (v) => `${L} AND b.Lost_Sale_Reason = ${v}`, order: 'b.Call_Start_Datetime DESC', needs: 'reason' },
     call_reason_lost: { where: (v) => `${L} AND b.Call_Reason = ${v} AND b.Sale_Flag = 0`, order: 'b.Lost_Sale_Flag DESC, b.Call_Start_Datetime DESC', needs: 'callreason' },
@@ -158,16 +169,16 @@ export function buildDashboardRouter(db: Lakebase): express.Router {
     avoidable: { where: () => `${L} AND b.Avoidable_Transfer_Flag = 1`, order: 'b.Call_Start_Datetime DESC' },
     destination: { where: (v) => `${L} AND b.Transfer_Flag = 1 AND b.Transfer_Destination = ${v}`, order: 'b.Avoidable_Transfer_Flag DESC, b.Call_Start_Datetime DESC', needs: 'destination' },
     scenario: {
-      where: (v) => `EXISTS (SELECT 1 FROM ${GOLD}.qry_scenario_calls s WHERE s.Scenario_ID = ${v} AND s.Call_ID = b.Call_ID)`,
+      where: (v) => `EXISTS (SELECT 1 FROM ${GOLD}.qry_cc_scenario_calls s WHERE s.Scenario_ID = ${v} AND s.Call_ID = b.Call_ID)`,
       order: 'b.Call_Start_Datetime DESC', needs: 'scenario',
     },
     agent_lost: {
-      where: (v) => `b.Agent_ID = ${v} AND b.Lost_Sale_Flag = 1 AND b.Month BETWEEN (SELECT MIN(Window_Start) FROM ${GOLD}.qry_agent_scorecard) AND b.Last_Full_Month`,
+      where: (v) => `b.Agent_ID = ${v} AND b.Lost_Sale_Flag = 1 AND b.Month BETWEEN (SELECT MIN(Window_Start) FROM ${GOLD}.qry_agent_scorecard) AND (SELECT MAX(Window_End) FROM ${GOLD}.qry_agent_scorecard)`,
       order: 'b.Call_Start_Datetime DESC', needs: 'agent',
     },
   };
   const LIST_SOURCE: Record<Needs, string> = {
-    scenario: `SELECT DISTINCT CAST(Scenario_ID AS STRING) AS v FROM ${GOLD}.qry_scenario_summary`,
+    scenario: `SELECT DISTINCT CAST(Scenario_ID AS STRING) AS v FROM ${GOLD}.qry_cc_scenarios`,
     driver: `SELECT DISTINCT Lost_Sale_Driver AS v FROM ${GOLD}.qry_lost_sales`,
     reason: `SELECT DISTINCT Lost_Sale_Reason AS v FROM ${GOLD}.qry_lost_sales`,
     jarvis: `SELECT DISTINCT Jarvis_Error_Type AS v FROM ${GOLD}.qry_jarvis_impact`,

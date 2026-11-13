@@ -163,11 +163,11 @@ def main():
     def calls_behind_figures():
         # Every figure opens its calls: the lists must match the numbers on the cards.
         s = get_ok("/api/dashboard/summary")
-        lost = get_ok("/api/dashboard/calls?list=lfm_lost")["totals"]
+        lost = get_ok("/api/dashboard/calls?list=mtd_lost")["totals"]
         scen = {str(r["Scenario_ID"]): r for r in get_ok("/api/dashboard/overview").get("scenarios") or []}
         one = get_ok("/api/dashboard/calls?list=scenario&value=1")["totals"]
-        if str(lost.get("rows")) != str(s.get("LFM_Lost_Sales")):
-            raise RuntimeError(f"lost-sales list {lost.get('rows')} vs card {s.get('LFM_Lost_Sales')}")
+        if str(lost.get("rows")) != str(s.get("MTD_Lost_Sales")):
+            raise RuntimeError(f"lost-sales list {lost.get('rows')} vs card {s.get('MTD_Lost_Sales')}")
         if str(one.get("rows")) != str((scen.get("1") or {}).get("Calls")):
             raise RuntimeError(f"scenario 1 list {one.get('rows')} vs card {(scen.get('1') or {}).get('Calls')}")
         return f"lost sales {lost['rows']} = card; scenario 1 {one['rows']} = card"
@@ -295,7 +295,7 @@ def main():
         d = get_ok("/api/explorer/data?" + urllib.parse.urlencode({"month": month}))
         s = get_ok("/api/dashboard/summary")
         t = d.get("totals") or {}
-        pairs = [("calls", "LFM_Calls"), ("new_sales", "LFM_New_Sales"), ("renewal_sales", "LFM_Renewal_Sales"), ("lost_sales", "LFM_Lost_Sales")]
+        pairs = [("calls", "MTD_Calls"), ("new_sales", "MTD_New_Sales"), ("renewal_sales", "MTD_Renewal_Sales"), ("lost_sales", "MTD_Lost_Sales")]
         off = [(a, t.get(a), s.get(b)) for a, b in pairs if round(float(t.get(a) or 0)) != round(float(s.get(b) or 0))]
         if off:
             raise RuntimeError(f"Explorer ({month}) does not reconcile to the Command Center: {off}")
