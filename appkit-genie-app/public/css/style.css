@@ -1502,9 +1502,9 @@ h2.sect::before{content:"";width:3px;height:12px;border-radius:2px;background:va
 .pbar .pb-broken{background:var(--red)}
 .pbar-legend .pb-kept{background:var(--green)}
 .pbar-legend .pb-broken{background:var(--red)}
-#ch3 .exec-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
-@media(max-width:1020px){#ch3 .exec-kpis{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){#ch3 .exec-kpis{grid-template-columns:1fr}}
+#ch1b .exec-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1020px){#ch1b .exec-kpis{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){#ch1b .exec-kpis{grid-template-columns:1fr}}
 .hs .view-btn{margin-top:6px;background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.3)}
 .hbar.muted-row{opacity:.55}
 .cost-wip{text-align:center;padding:40px 24px}
