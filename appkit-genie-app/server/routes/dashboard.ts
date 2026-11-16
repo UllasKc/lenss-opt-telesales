@@ -87,7 +87,7 @@ export function buildDashboardRouter(db: Lakebase): express.Router {
       return [] as Record<string, string | null>[];
     });
     const [daily, weekly, monthly, salesMix, reasons, lostDrivers, jarvis, xsellTeams, xsellCats, firstCall, transfers,
-      scenarios, recovery, coaching, tenure, saleValue, refReasons, refDrivers, refXsell, refTransfers, refRecovery] = await Promise.all([
+      scenarios, recovery, coaching, tenure, saleValue, customerReasons, refReasons, refDrivers, refXsell, refTransfers, refRecovery] = await Promise.all([
       q(`SELECT *, CAST(Call_Date AS STRING) AS d FROM ${GOLD}.qry_daily_kpis
            WHERE Call_Date > date_sub((SELECT As_Of_Date FROM ${GOLD}.qry_cc_kpis), 42) ORDER BY Call_Date`),
       q(`SELECT *, CAST(Week_Ending AS STRING) AS we FROM ${GOLD}.qry_weekly_kpis ORDER BY Week_Ending`),
@@ -97,7 +97,7 @@ export function buildDashboardRouter(db: Lakebase): express.Router {
            GROUP BY Sales_Category, Sale_Type ORDER BY Sales DESC`),
       q(`SELECT Call_Reason, Reason_Group, Intended_Category, SUM(Calls) AS Calls, SUM(Sale_Calls) AS Sale_Calls,
                 1.0*SUM(Sale_Calls)/SUM(Calls) AS Sale_Conversion, SUM(Lost_Sales) AS Lost_Sales, SUM(Lost_People) AS Lost_People,
-                SUM(Lost_Customer) AS Lost_Customer, SUM(Lost_System) AS Lost_System,
+                SUM(Customer_No_Sales) AS Customer_No_Sales, SUM(Lost_System) AS Lost_System,
                 SUM(Transfers) AS Transfers
            FROM ${GOLD}.qry_reason_conversion WHERE Month = ${CM} GROUP BY Call_Reason, Reason_Group, Intended_Category ORDER BY Calls DESC`),
       q(`SELECT Lost_Sale_Driver, Lost_Sale_Reason, SUM(Lost_Sales) AS Lost_Sales, SUM(Came_Back) AS Came_Back,
@@ -127,6 +127,9 @@ export function buildDashboardRouter(db: Lakebase): express.Router {
                                         AND (SELECT MAX(Window_End) FROM ${GOLD}.qry_agent_scorecard)
            GROUP BY Tenure_Band ORDER BY ord`),
       q(`SELECT * FROM ${GOLD}.qry_sale_value`),
+      // Customers who wanted to buy but couldn't or chose not to: shown beside lost sales, not counted in them.
+      q(`SELECT Customer_No_Sale_Reason, COUNT(*) AS Calls FROM ${GOLD}.qry_calls
+           WHERE Is_MTD = 1 AND Customer_No_Sale_Flag = 1 GROUP BY Customer_No_Sale_Reason ORDER BY Calls DESC`),
       // The last full month, for the small "September: ..." reference lines
       q(`SELECT Call_Reason, 1.0*SUM(Sale_Calls)/SUM(Calls) AS Sale_Conversion, SUM(Calls) AS Calls
            FROM ${GOLD}.qry_reason_conversion WHERE Month = ${LFM} AND Intended_Category IS NOT NULL GROUP BY Call_Reason`),
@@ -139,7 +142,7 @@ export function buildDashboardRouter(db: Lakebase): express.Router {
     ]);
     const ref = { reasons: refReasons, drivers: refDrivers, xsell: refXsell[0] ?? {}, transfers: refTransfers[0] ?? {}, recovery: refRecovery };
     return { daily, weekly, monthly, salesMix, reasons, lostDrivers, jarvis, xsellTeams, xsellCats, firstCall, transfers,
-      scenarios, recovery, coaching, tenure, saleValue, ref };
+      scenarios, recovery, coaching, tenure, saleValue, customerReasons, ref };
   };
   router.get('/api/dashboard/overview', (_req, res) => cached('overview', res, computeOverview));
 
@@ -156,6 +159,7 @@ export function buildDashboardRouter(db: Lakebase): express.Router {
     day_sales: { where: () => 'b.Is_Latest_Day = 1 AND b.Sale_Flag = 1', order: 'b.Call_Start_Datetime DESC' },
     mtd_sales: { where: () => 'b.Is_MTD = 1 AND b.Sale_Flag = 1', order: 'b.Call_Start_Datetime DESC' },
     mtd_lost: { where: () => 'b.Is_MTD = 1 AND b.Lost_Sale_Flag = 1', order: 'b.Call_Start_Datetime DESC' },
+    customer_no_sale: { where: () => 'b.Is_MTD = 1 AND b.Customer_No_Sale_Flag = 1', order: 'b.Call_Start_Datetime DESC' },
     driver: { where: (v) => `${L} AND b.Lost_Sale_Driver = ${v}`, order: 'b.Call_Start_Datetime DESC', needs: 'driver' },
     reason: { where: (v) => `${L} AND b.Lost_Sale_Reason = ${v}`, order: 'b.Call_Start_Datetime DESC', needs: 'reason' },
     call_reason_lost: { where: (v) => `${L} AND b.Call_Reason = ${v} AND b.Sale_Flag = 0`, order: 'b.Lost_Sale_Flag DESC, b.Call_Start_Datetime DESC', needs: 'callreason' },

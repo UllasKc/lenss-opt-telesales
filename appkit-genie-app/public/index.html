@@ -64,6 +64,7 @@
       <div class="hero-side">
         <div class="hero-stats" id="heroStats"></div>
         <div class="hero-note" id="heroNote"></div>
+        <div class="hero-synth"><span class="synth-tag">Synthetic data</span><span>Demo data shaped to Optus's sales and the Concentrix slides. No real customer records.</span></div>
       </div>
     </div>
 
@@ -77,11 +78,11 @@
     </section>
 
     <nav class="story-nav" aria-label="Command Center story">
-      <a href="#ch1">1 · Today</a><a href="#ch2">2 · Where sales are lost</a><a href="#ch3">3 · Jarvis</a><a href="#ch4">4 · Cross-sell</a><a href="#ch5">5 · The first call</a><a href="#ch6">6 · Coaching</a><a href="#ch7">7 · Closing the gap</a>
+      <a href="#ch1">1 · Are we on target?</a><a href="#ch2">2 · Where sales are lost</a><a href="#ch3">3 · Systems: Jarvis</a><a href="#ch4">4 · People: the call</a><a href="#ch5">5 · Closing the gap</a>
     </nav>
 
     <section class="chapter" id="ch1b">
-      <div class="ch-head"><span class="ch-n">1</span><div><div class="ch-q">How is this month going, and which way are we heading?</div><p class="ch-take" id="ch1Take"></p></div></div>
+      <div class="ch-head"><span class="ch-n">1</span><div><div class="ch-q">Are we on target this month?</div><p class="ch-take" id="ch1Take"></p></div></div>
       <div class="exec-kpis" id="execKpis"></div>
       <div class="grid two" style="margin-top:14px">
         <div class="card panel" id="pnlWeekly"></div>
@@ -99,7 +100,7 @@
     </section>
 
     <section class="chapter" id="ch3">
-      <div class="ch-head"><span class="ch-n">3</span><div><div class="ch-q">What is Jarvis costing us?</div><p class="ch-take" id="ch3Take"></p></div></div>
+      <div class="ch-head"><span class="ch-n">3</span><div><div class="ch-q">Systems: what is Jarvis costing us?</div><p class="ch-take" id="ch3Take"></p></div></div>
       <div class="grid two">
         <div class="card panel" id="pnlJarvis"></div>
         <div class="card panel" id="pnlJarvisTrend"></div>
@@ -107,37 +108,27 @@
     </section>
 
     <section class="chapter" id="ch4">
-      <div class="ch-head"><span class="ch-n">4</span><div><div class="ch-q">Are we asking for the second sale?</div><p class="ch-take" id="ch4Take"></p></div></div>
+      <div class="ch-head"><span class="ch-n">4</span><div><div class="ch-q">People: are consultants making the most of every call?</div><p class="ch-take" id="ch4Take"></p></div></div>
       <div class="grid two">
         <div class="card panel" id="pnlXsell"></div>
         <div class="card panel" id="pnlXsellTeams"></div>
       </div>
-    </section>
-
-    <section class="chapter" id="ch5">
-      <div class="ch-head"><span class="ch-n">5</span><div><div class="ch-q">What happens when the first call doesn't close?</div><p class="ch-take" id="ch5Take"></p></div></div>
-      <div class="grid three cc-grid">
+      <div class="grid three cc-grid" style="margin-top:14px">
         <div class="card panel" id="pnlFirstCall"></div>
         <div class="card panel" id="pnlCallbacks"></div>
         <div class="card panel" id="pnlTransfers"></div>
       </div>
     </section>
 
-    <section class="chapter" id="ch6">
-      <div class="ch-head"><span class="ch-n">6</span><div><div class="ch-q">Who needs coaching, and on what?</div><p class="ch-take" id="ch6Take"></p></div></div>
-      <div class="card panel" id="pnlCoaching"></div>
-      <div class="card panel" id="pnlTenure" style="margin-top:14px"></div>
-    </section>
-
-    <section class="chapter" id="ch7">
-      <div class="ch-head"><span class="ch-n">7</span><div><div class="ch-q">How do we close the gap to target?</div><p class="ch-take" id="ch7Take"></p></div></div>
+    <section class="chapter" id="ch5">
+      <div class="ch-head"><span class="ch-n">5</span><div><div class="ch-q">How do we close the gap to target?</div><p class="ch-take" id="ch5Take"></p></div></div>
       <div class="card panel" id="pnlRecovery"></div>
       <div class="scenario-grid" id="scenarios" style="margin-top:14px"></div>
     </section>
 
     <button class="card cc-explore" data-tab-jump="explorer">
       <span class="cc-explore-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16l-6 7.5V19l-4 2v-8.5z"/></svg></span>
-      <span><b>Want to dig deeper?</b> Open Explorer to slice any month by team, call reason, product, sales category, tenure, state, customer type, call result, lost-sale driver and FCR outcome.</span>
+      <span><b>Want to dig deeper?</b> Open Explorer to slice any month by team, call reason, product, sales category, tenure, state, customer type, call result, lost-sale driver and FCR outcome, and to see who to coach first.</span>
       <span class="cc-explore-go" aria-hidden="true">→</span>
     </button>
     <div class="home-foot">Every figure comes from certified, governed views of Optus telesales data (synthetic demo data shaped to Optus's sales and the Concentrix FCR and conversion slides, to 20 October 2026; amounts in AUD). No AI is used to compute them. <button class="ask-link plain" id="kpiDictBtn2">See KPI definitions</button></div>
@@ -179,6 +170,12 @@
 
     <h2 class="sect">Call records <span class="sect-note">the calls behind the numbers</span></h2>
     <div class="card panel" id="xpAccounts"></div>
+
+    <!-- Coaching: consultants over the last three months to date (not affected by the filters above). -->
+    <h2 class="sect" id="coaching">Who to coach first <span class="sect-note">the last three months to date; the filters above don't apply</span></h2>
+    <p class="xp-coach-take" id="coachTake"></p>
+    <div class="card panel" id="pnlCoaching"></div>
+    <div class="card panel" id="pnlTenure" style="margin-top:14px"></div>
     <div class="home-foot">Same governed definitions as the Command Center: with the current month and no other filter, every figure here reconciles to it exactly. Conversion is sales ÷ handled calls; FCR, transfer and repeat rates are over answered calls.</div>
   </section>
   <!-- KPI dictionary -->

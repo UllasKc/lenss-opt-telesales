@@ -4,6 +4,15 @@ Everything that has changed in LensS Telesales Intelligence for Optus, newest fi
 
 ---
 
+## v0.3.1 (2026-11-16): lost sales are People and System only; a five-chapter story
+- **Lost sale** now counts only causes Optus could fix: People and System. Customer reasons (failed credit check, ID verification, no port-in account number, price, wants to think) become `Customer_No_Sale_Flag` / `Customer_No_Sale_Reason` in silver. They are shown beside lost sales but not counted. October: 245 lost sales (Systems 132, People 113) and 172 customer reasons. September: 395 lost sales (Jarvis 114). Scenario 5 is now "Customer Reasons (Not Lost Sales)", with no sales value.
+- **Command Center, five chapters:** 1 Are we on target? · 2 Where sales are lost · 3 Systems: Jarvis · 4 People: the call (cross-sell, first call, callbacks, transfers) · 5 Closing the gap. Coaching moved to the bottom of Explorer.
+- **Banner tiles:** sales this month · new sales conversion (4.2%, against the 5.4% target) · sales stopped by Jarvis (65) · FCR. A "Synthetic data" tag sits at the bottom of the banner.
+- **Executive summary:** five one-line points, one per chapter, without reference lines; new bottom line.
+- The source workbook is unchanged; the new definition is applied in silver.
+
+---
+
 ## v0.3.0 (2026-11-12): answers from the review meeting
 - **Targets:** 5.4% new sales conversion confirmed; renewals, FCR, cross-sell and handle-time targets stay placeholders.
 - **October Home sales** follow the slide (Total Home new connections 459 for the full month, about 10% above Optus's table), as Optus confirmed. The September slide weeks now hit the slide exactly, cross-sell lines included.

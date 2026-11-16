@@ -63,7 +63,7 @@ EXPECTED_CALLS, EXPECTED_ORDERS = 181454, 13176
 CHECK_MONTH = "2026-09"
 EXPECTED_OCT_SALES = {"Total Home - New Connection": 510, "Postpaid Voice - Renewal": 290, "Home - Renewal": 230,
                       "Postpaid Voice - New Connection": 164, "Connected Device - New Connection": 28}
-EXPECTED_SCENARIOS = {"1": 302, "2": 115, "3": 1957, "4": 730, "5": 288}
+EXPECTED_SCENARIOS = {"1": 302, "2": 114, "3": 1957, "4": 730, "5": 288}  # 2: People/System lost sales only (one Jarvis error was a customer reason)
 
 
 # Windows consoles often can't print every character; replace them rather than crash the deploy.

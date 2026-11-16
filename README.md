@@ -9,19 +9,21 @@ Decision intelligence for Optus telesales, built on Databricks by the Concentrix
 | **Assistant** | Plain-language questions answered by a Genie space ("LensS query engine"): Quick answer, Deep analysis or Auto, with a conversation-aware router, conversation memory, charts, SQL and a quality score |
 | **Observability** | Pipeline traces, answer quality and faithfulness, performance, drift, security and guardrails, Evaluations, Responsible AI and Databricks cost |
 
-Every Command Center and Explorer figure comes from certified SQL views; no AI computes them. Current version: **v0.3.0** (see [CHANGELOG.md](CHANGELOG.md)). Built from LensS Optus Collections (commit e9e3b47).
+Every Command Center and Explorer figure comes from certified SQL views; no AI computes them. Current version: **v0.3.1** (see [CHANGELOG.md](CHANGELOG.md)). Built from LensS Optus Collections (commit e9e3b47).
 
 ## The story the Command Center tells
 
 Leaders review the dashboard in the last 10 days of the month, so "today" is **Tuesday 20 October 2026** and the data stops there:
 
-1. **Today:** October so far converts 4.2% against the 5.4% target (the Concentrix slide showed 4.0% MTD; October Home sales follow the slide, which Optus confirmed); on this pace the month closes near 668 new sales against 851 needed, and hitting target would take about 7.5% over the last 11 days. September: 702 new sales from 17,049 calls (4.1%), 219 short of target.
-2. **Where sales are lost:** "New Mobile Plan / Port In" is the biggest reason customers call, but only 3.8% of those calls sell, against 15.7% for new NBN. 683 customers who wanted to buy didn't (Customer 42%, System 33%, People 25%; over the year 43.3 / 30.9 / 25.8, as Optus confirmed).
-3. **Jarvis:** 115 sales stopped by Jarvis errors (about 0.7 points; 0.6 over the year, as Optus reported); error calls take twice as long.
-4. **Cross-sell:** new since August 2026 and the team is in training: 302 of 507 home internet sales had no mobile offered; the attempt rate rose from 15% in August to 23% in September against a 60% target.
-5. **The first call:** lost sales are rarely won back when the customer calls again; promised callbacks often end with the customer calling us (518 of 1,348); 730 transfers were avoidable.
-6. **Coaching:** the consultants furthest below the median, with low Elevate discovery scores; nesting consultants convert 5.0% against 7.2%.
-7. **Closing the gap:** fix Jarvis, offer the cross-sell and coach discovery: three levers with owners and their value against the gap.
+Five chapters, one story: are we on target, where are sales lost, the systems cause, the people cause, and how to close the gap. Every chapter shows October so far (1–20 October), with September in small reference lines. The [walkthrough](docs/Command_Center_Walkthrough.md) has every figure.
+
+1. **Are we on target?** October so far converts 4.2% against the 5.4% target (the Concentrix slide showed 4.0% MTD). On this pace the month closes near 668 new sales against 851 needed; hitting target would take about 7.5% over the last 11 days.
+2. **Where sales are lost:** "New Mobile Plan / Port In" is the biggest reason customers call, but only 5.4% of those calls sell, against 14.8% for new NBN. 245 customers who wanted to buy were lost to causes Optus can fix: Systems 54%, People 46%. A **lost sale** counts only People and System causes. Customer reasons (failed credit check, ID, port-in account number, price: 172 in October) are shown beside lost sales but not counted. Optus's 43.3 / 25.8 / 30.9 split includes them; without them it is People 45%, System 55%.
+3. **Systems: Jarvis:** Jarvis errors stopped 65 sales (0.6 points, as Optus reported); error calls take twice as long.
+4. **People: the call:** 113 sales lost to discovery, ownership and transfers; 172 of 296 home internet sales had no mobile offered (cross-sell is new since August and the team is in training); 295 of 765 promised callbacks were left to the customer; 509 transfers were avoidable.
+5. **Closing the gap:** fixing Jarvis, the cross-sell and discovery would have added about 172 new sales so far, more than the 118-sale gap.
+
+Who to coach first (the consultants furthest below the median, over the last three months) is at the bottom of the Explorer tab.
 
 ## The data
 

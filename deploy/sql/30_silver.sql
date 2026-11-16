@@ -29,9 +29,14 @@ SELECT
   CAST(ID_Verification_Result AS STRING)                 AS ID_Verification_Result,
   CASE WHEN Port_In_Requested_Flag = 'Y' THEN 1 ELSE 0 END AS Port_In_Requested_Flag,
   CAST(Port_In_Status AS STRING)                         AS Port_In_Status,
-  CASE WHEN Lost_Sale_Flag = 'Y' THEN 1 ELSE 0 END       AS Lost_Sale_Flag,
-  CAST(Lost_Sale_Driver AS STRING)                       AS Lost_Sale_Driver,
-  CAST(Lost_Sale_Reason AS STRING)                       AS Lost_Sale_Reason,
+  -- A lost sale is one Optus could have saved: a People or System cause. When the customer
+  -- couldn't or chose not to buy (failed credit check, ID, port-in account number, price,
+  -- wants to think about it), it is a customer reason, not a lost sale.
+  CASE WHEN Lost_Sale_Flag = 'Y' AND Lost_Sale_Driver IN ('People', 'System') THEN 1 ELSE 0 END AS Lost_Sale_Flag,
+  CASE WHEN Lost_Sale_Flag = 'Y' AND Lost_Sale_Driver IN ('People', 'System') THEN CAST(Lost_Sale_Driver AS STRING) END AS Lost_Sale_Driver,
+  CASE WHEN Lost_Sale_Flag = 'Y' AND Lost_Sale_Driver IN ('People', 'System') THEN CAST(Lost_Sale_Reason AS STRING) END AS Lost_Sale_Reason,
+  CASE WHEN Lost_Sale_Flag = 'Y' AND Lost_Sale_Driver = 'Customer' THEN 1 ELSE 0 END AS Customer_No_Sale_Flag,
+  CASE WHEN Lost_Sale_Flag = 'Y' AND Lost_Sale_Driver = 'Customer' THEN CAST(Lost_Sale_Reason AS STRING) END AS Customer_No_Sale_Reason,
   CASE WHEN Callback_Promised_Flag = 'Y' THEN 1 ELSE 0 END AS Callback_Promised_Flag,
   CASE WHEN Jarvis_Error_Flag = 'Y' THEN 1 ELSE 0 END    AS Jarvis_Error_Flag,
   CAST(Jarvis_Error_Type AS STRING)                      AS Jarvis_Error_Type,

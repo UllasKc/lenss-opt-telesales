@@ -59,14 +59,14 @@ const MEASURES = `
   1.0*SUM(Cross_Sell_Attempted_Flag)/NULLIF(SUM(Cross_Sell_Opportunity_Flag),0) AS xsell_attempt_rate,
   SUM(Missed_Cross_Sell_Flag) AS xsell_missed,
   AVG(Handle_Time_Seconds) AS avg_handle,
-  SUM(CASE WHEN Lost_Sale_Driver = 'Customer' THEN 1 ELSE 0 END) AS lost_customer,
+  SUM(Customer_No_Sale_Flag) AS customer_no_sales,
   SUM(CASE WHEN Lost_Sale_Driver = 'People' THEN 1 ELSE 0 END) AS lost_people,
   SUM(CASE WHEN Lost_Sale_Driver = 'System' THEN 1 ELSE 0 END) AS lost_system`;
 
 /** The columns of a call record, for the call lists and the Explorer's records. */
 export const CALL_COLUMNS = `b.Call_ID, CAST(b.Call_Start_Datetime AS STRING) AS Call_Start, b.Month, b.Agent_ID, b.Team_Lead, b.Tenure_Band,
   b.Customer_ID, b.Customer_Type, b.State, b.Call_Direction, b.Call_Reason, b.Call_Result, b.Sales_Category, b.New_Sales, b.Renewal_Sales,
-  b.Monthly_Revenue, b.Lost_Sale_Driver, b.Lost_Sale_Reason, b.Jarvis_Error_Flag, b.Jarvis_Error_Type, b.Jarvis_Ticket_Resolution_Days,
+  b.Monthly_Revenue, b.Lost_Sale_Driver, b.Lost_Sale_Reason, b.Customer_No_Sale_Reason, b.Jarvis_Error_Flag, b.Jarvis_Error_Type, b.Jarvis_Ticket_Resolution_Days,
   b.Cross_Sell_Outcome, b.Cross_Sell_Product, b.Transfer_Destination, b.Transfer_Valid_Flag, b.FCR_Outcome, b.Repeat_Timeline,
   b.Callback_Promised_Flag, b.Handle_Time_Seconds`;
 

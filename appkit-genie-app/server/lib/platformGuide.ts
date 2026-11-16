@@ -20,21 +20,21 @@ The answers come from the **LensS Intelligence Engine**, which turns a question 
   {
     id: 'command-center', title: 'Command Center tab',
     keywords: ['command center', 'command centre', 'home', 'dashboard', 'first page', 'overview', 'kpi', 'metrics', 'summary', 'chapters', 'scenarios', 'scenario', 'trend', 'view calls', 'calls behind', 'recovery plan', 'pace'],
-    text: `The **Command Center** is the one-minute view of Optus telesales, told as one story in seven chapters (the bar under the summary jumps to each):
-- **1 · Today (the top banner):** the month so far against the new sales conversion target, the pace to the end of the month, and four tiles: sales this month, the target (with how many more new sales the rest of the month needs), lost sales this month and FCR this month. Every chapter shows the current month to date (October to the 20th), with the last full month (September) in small reference lines. Below the summary: conversion, renewals, plan revenue and FCR, weekly conversion by product, daily conversion, and what was sold by Optus's five categories.
-- **Executive summary:** "The month in 30 seconds", one line per chapter and a bottom line; each line jumps to its chapter.
-- **2 · Where sales are lost:** which call reasons turn into sales (mobile against NBN), and why customers who wanted to buy didn't (Customer, People, System).
-- **3 · Jarvis:** sales stopped by Jarvis errors by error type, ticket resolution days, and the month-by-month trend.
-- **4 · Cross-sell:** the mobile sale on NBN calls (sales, no Optus mobile, offered, sold) and the cross-sell offered by team.
-- **5 · The first call:** lost sales that came back and bought, promised callbacks the customer had to chase, repeat calls, and where transfers go (avoidable ones too).
-- **6 · Coaching:** the consultants to coach first and on what, and conversion by tenure.
-- **7 · Closing the gap:** the recovery plan (fix Jarvis, offer the cross-sell, coach discovery) against the gap to target, and the five scenarios of the Scenario Guide.
+    text: `The **Command Center** is the one-minute view of Optus telesales, told as one story in five chapters (the bar under the summary jumps to each): are we on target, where are sales lost, the systems cause (Jarvis), the people cause (the call itself), and how to close the gap.
+- **The top banner:** the month so far against the new sales conversion target, the pace to the end of the month, and four tiles: sales this month, new sales conversion (with how many more new sales the rest of the month needs), sales stopped by Jarvis errors, and FCR this month. A "Synthetic data" tag sits at the bottom. Every chapter shows the current month to date (October to the 20th), with the last full month (September) in small reference lines.
+- **Executive summary:** "The month in 30 seconds", five lines (one per chapter, each with its figure) and a bottom line; each line jumps to its chapter.
+- **1 · Are we on target?:** conversion, renewals, plan revenue and FCR, weekly conversion by product, daily conversion, and what was sold by Optus's five categories.
+- **2 · Where sales are lost:** which call reasons turn into sales (mobile against NBN), and why customers who wanted to buy didn't. A lost sale is a People or System cause; customer reasons (failed credit check, ID, port-in account number, price) are shown beside them but not counted as lost sales.
+- **3 · Systems: Jarvis:** sales stopped by Jarvis errors by error type, ticket resolution days, and the month-by-month trend.
+- **4 · People: the call:** the mobile cross-sell on NBN sales and by team, lost sales that came back and bought, promised callbacks the customer had to chase, repeat calls, and where transfers go (avoidable ones too).
+- **5 · Closing the gap:** the recovery plan (fix Jarvis, offer the cross-sell, coach discovery) against the gap to target, and the five scenarios of the Scenario Guide.
+- **Who to coach first** (consultants and conversion by tenure, over the last three months to date) is at the bottom of the **Explorer** tab.
 - **View** on any figure opens the calls behind it, with **Export CSV**. **KPI definitions** (in the banner and at the bottom) explain every figure.
 Every panel has an **Ask LensS** button; hover over it to see the exact question it will ask.`,
   },
   {
     id: 'explorer', title: 'Explorer tab',
-    keywords: ['explorer', 'filter', 'filters', 'drill', 'drill down', 'slice', 'slicer', 'why', 'state', 'product', 'month', 'team', 'call reason', 'call result', 'export', 'csv', 'download data', 'calls list', 'records', 'segment', 'heatmap'],
+    keywords: ['explorer', 'coach', 'coaching', 'filter', 'filters', 'drill', 'drill down', 'slice', 'slicer', 'why', 'state', 'product', 'month', 'team', 'call reason', 'call result', 'export', 'csv', 'download data', 'calls list', 'records', 'segment', 'heatmap'],
     text: `The **Explorer** answers "why": it slices the same governed data by any combination of filters.
 - **Filters:** month (or all months), team lead, product interest, call reason, sales category, consultant tenure, state, customer type, call direction, call result, lost-sale driver and FCR outcome. It opens on the current month to date. Active filters show as chips; click a chip's × to remove it, or **Reset filters** (back to the last full month).
 - **Headline tiles** show the filtered figures (calls, new sales, new sales conversion, calls that closed a sale, plan revenue, lost sales, FCR, transfers, cross-sell offered, handle time), compared with all calls in the same period.
@@ -42,6 +42,7 @@ Every panel has an **Ask LensS** button; hover over it to see the exact question
 - **Two dimensions at once:** a heatmap of any two dimensions (team by product by default), coloured against the view's overall figure; click a cell to see its calls.
 - **Sales and FCR outcomes** by the chosen dimension, **lost sales by driver** and the **monthly trend of this view** follow the filters (the trend ignores the month filter).
 - **Call records:** the calls in the current view (sales and lost sales first), with search, sort and paging. **Export CSV** downloads them. **View** on any item opens its calls.
+- **Who to coach first:** at the bottom, the consultants in the lowest conversion quartile over the last three months to date, with their discovery score, cross-sell rate and coaching focus, and conversion by tenure (the filters don't apply to it).
 - **Ask LensS about this view** asks why the filtered slice differs from the rest; every panel's question carries the active filters.
 With the current month and no other filter, every Explorer figure reconciles exactly to the Command Center.`,
   },

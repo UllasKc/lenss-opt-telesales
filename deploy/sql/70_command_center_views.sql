@@ -108,7 +108,7 @@ SELECT 1 AS Scenario_ID, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls
 UNION ALL SELECT 2, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_MTD = 1 AND Jarvis_Lost_Sale_Flag = 1
 UNION ALL SELECT 3, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_MTD = 1 AND Unresolved_Sales_First_Call_Flag = 1
 UNION ALL SELECT 4, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_MTD = 1 AND Avoidable_Transfer_Flag = 1
-UNION ALL SELECT 5, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_MTD = 1 AND Lost_Sale_Driver = 'Customer';
+UNION ALL SELECT 5, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_MTD = 1 AND Customer_No_Sale_Flag = 1;
 COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_cc_scenario_calls IS 'The calls in each scenario (Scenario_ID 1 to 5) in the current month to date (October 2026 to the 20th), using the Scenario Guide rules. qry_scenario_calls holds the last full month.';
 
 CREATE OR REPLACE VIEW {{catalog}}.{{prefix}}_gold.qry_cc_scenarios AS
@@ -128,7 +128,7 @@ WITH n AS (
 )
 SELECT g.Scenario_ID, g.Scenario_Name, g.Business_Question, g.Filter_Logic, cm.Month, COALESCE(n.Calls, 0) AS Calls, n.Customers,
        CASE g.Scenario_ID WHEN 1 THEN n.Calls * t.Take_Up * mob.Avg_First_12M_Revenue
-                          WHEN 4 THEN NULL ELSE n.Value_If_Sold END AS Est_First_12M_Value,
+                          WHEN 4 THEN NULL WHEN 5 THEN NULL ELSE n.Value_If_Sold END AS Est_First_12M_Value,
        g.Value_Basis, g.Month AS Last_Full_Month, g.Calls AS Last_Full_Month_Calls
 FROM {{catalog}}.{{prefix}}_gold.qry_scenario_summary g
 LEFT JOIN n ON n.Scenario_ID = g.Scenario_ID CROSS JOIN t CROSS JOIN mob CROSS JOIN cm;

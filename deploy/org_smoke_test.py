@@ -41,7 +41,7 @@ SECTIONS = "ABCDEFGHIJK"
 SLOW = "the slow parts (deep analyses, accuracy evaluations, live conversations) were skipped with --skip-slow"
 
 # The source data as profiled (the v1 workbook: data to Tue 20 Oct 2026, last full month September 2026): checked as WARN, not FAIL.
-SOURCE = {"LFM_Calls": 17049, "LFM_New_Sales": 702, "LFM_Renewal_Sales": 520, "LFM_Lost_Sales": 683, "LFM_Jarvis_Lost_Sales": 115,
+SOURCE = {"LFM_Calls": 17049, "LFM_New_Sales": 702, "LFM_Renewal_Sales": 520, "LFM_Lost_Sales": 395, "LFM_Jarvis_Lost_Sales": 114,
           "MTD_Calls": 10166, "MTD_New_Sales": 431, "Day_Calls": 672}
 SOURCE_OCT_SALES = {"Total Home - New Connection": 506, "Postpaid Voice - Renewal": 291, "Home - Renewal": 245,
                     "Postpaid Voice - New Connection": 174, "Connected Device - New Connection": 29}
@@ -267,7 +267,7 @@ def main():
             off.append(f"last full month {s.get('Last_Full_Month')} (source data: 2026-09)")
         if off:
             raise Warn("differs from the source data as profiled: " + "; ".join(off))
-        return "matches the v1 workbook: 17,049 September calls, 702 new sales, 520 renewals, 683 lost sales, 115 blocked by Jarvis"
+        return "matches the v1 workbook: 17,049 September calls, 702 new sales, 520 renewals, 395 lost sales (People and System), 114 blocked by Jarvis"
     check("B2", "Figures match the source data", source_facts)
 
     def overview():
@@ -299,7 +299,8 @@ def main():
         fc = next((r for r in o["firstCall"] if r["Month"] == s["Current_Month"]), {})
         pairs = [("mtd_lost", None, s["MTD_Lost_Sales"]), ("jarvis_lost", None, s["MTD_Jarvis_Lost_Sales"]),
                  ("lost_came_back", None, fc.get("Lost_Came_Back")), ("lost_bought", None, fc.get("Lost_Bought_On_Return")),
-                 ("callbacks_chased", None, fc.get("Callbacks_Chased"))]
+                 ("callbacks_chased", None, fc.get("Callbacks_Chased")),
+                 ("customer_no_sale", None, sum(num(r["Calls"]) for r in o.get("customerReasons", [])))]
         pairs += [("scenario", str(x["Scenario_ID"]), x["Calls"]) for x in o["scenarios"]]
         drivers = {}
         for r in o["lostDrivers"]:
@@ -550,8 +551,8 @@ def main():
             "What is the average Jarvis ticket resolution time by error type?",
             lambda a: None if has(a, "Order submission") else "expected 'Order submission failed' among the error types"))
         check("E8", "Lost sales by driver and reason", key_question(
-            "Break down lost sales by driver (Customer, People, System) and reason.",
-            lambda a: None if has(a, "Customer", "People", "System") else "not every driver named"))
+            "Break down lost sales by driver (People, System) and reason.",
+            lambda a: None if has(a, "People", "System") else "not every driver named"))
         check("E9", "Credit score: says the data has none", key_question(
             "What is the average credit score of customers who failed the credit check?",
             lambda a: None if re.search(r"credit", a["text"], re.I) and re.search(r"not (in|available|include|part)|unavailable|no credit|doesn'?t (have|hold|contain|include)", a["text"].replace("’", "'"), re.I)

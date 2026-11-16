@@ -42,7 +42,7 @@ fields:
     synonyms: [disposition, outcome, call outcome, result]
   - name: Lost_Sale_Driver
     expr: source.Lost_Sale_Driver
-    synonyms: [driver, lost sale driver, people, customer, system, system error]
+    synonyms: [driver, lost sale driver, people, system, system error]
   - name: FCR_Outcome
     expr: source.FCR_Outcome
     synonyms: [FCR outcome, first contact resolution, repeat, transfer]
@@ -78,15 +78,19 @@ measures:
     comment: "Plan revenue over the first 12 months of what was sold (AUD)"
   - name: lost_sales
     expr: SUM(source.Lost_Sale_Flag)
-    comment: "Calls where a customer who wanted to buy did not, for an identified reason"
+    comment: "Calls where a customer who wanted to buy did not, for a People or System cause Optus could have fixed"
     synonyms: [lost opportunities, missed sales]
+  - name: customer_no_sales
+    expr: SUM(source.Customer_No_Sale_Flag)
+    comment: "Customers who wanted to buy but could not or chose not to (credit check, ID, port-in account number, price): not lost sales"
+    synonyms: [customer reasons, eligibility blockers, failed credit check]
   - name: jarvis_lost_sales
     expr: SUM(source.Jarvis_Lost_Sale_Flag)
     comment: "Sales a Jarvis error stopped"
     synonyms: [system errors, Jarvis errors]
   - name: fcr_rate
     expr: SUM(source.FCR_Flag) / COUNT(source.FCR_Flag)
-    comment: "Answered calls not transferred and not repeated within 14 days / answered calls (recent calls are unlocked)"
+    comment: "Answered calls not transferred and not repeated within 14 days / answered calls (the last 14 days can still fall)"
     synonyms: [FCR, first contact resolution]
   - name: transfer_rate
     expr: SUM(CASE WHEN source.FCR_Flag IS NOT NULL THEN source.Transfer_Flag END) / COUNT(source.FCR_Flag)

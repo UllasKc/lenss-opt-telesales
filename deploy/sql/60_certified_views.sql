@@ -163,11 +163,11 @@ SELECT Month, Call_Reason, Reason_Group, Intended_Category,
        COUNT(*) AS Calls, SUM(Sale_Flag) AS Sale_Calls, 1.0*SUM(Sale_Flag)/COUNT(*) AS Sale_Conversion,
        SUM(Lost_Sale_Flag) AS Lost_Sales,
        SUM(CASE WHEN Lost_Sale_Driver = 'People' THEN 1 ELSE 0 END) AS Lost_People,
-       SUM(CASE WHEN Lost_Sale_Driver = 'Customer' THEN 1 ELSE 0 END) AS Lost_Customer,
+       SUM(Customer_No_Sale_Flag) AS Customer_No_Sales,
        SUM(CASE WHEN Lost_Sale_Driver = 'System' THEN 1 ELSE 0 END) AS Lost_System,
        SUM(Transfer_Flag) AS Transfers, AVG(Handle_Time_Seconds) AS Avg_Handle_Seconds
 FROM {{catalog}}.{{prefix}}_gold.qry_calls GROUP BY Month, Call_Reason, Reason_Group, Intended_Category;
-COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_reason_conversion IS 'Answers: "Which call reasons convert best and worst?" and "Why is mobile weaker than NBN?". Per month and call reason: calls, calls that closed a sale and their share (Sale_Conversion = sale calls / calls with that reason), lost sales by driver, transfers and handle time. Service reasons (billing, order status) never convert.';
+COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_reason_conversion IS 'Answers: "Which call reasons convert best and worst?" and "Why is mobile weaker than NBN?". Per month and call reason: calls, calls that closed a sale and their share (Sale_Conversion = sale calls / calls with that reason), lost sales by driver (People, System), customer reasons (Customer_No_Sales: not counted as lost), transfers and handle time. Service reasons (billing, order status) never convert.';
 
 -- 7. Lost sales: why customers who wanted to buy did not, and what it is worth.
 CREATE OR REPLACE VIEW {{catalog}}.{{prefix}}_gold.qry_lost_sales AS
@@ -179,7 +179,7 @@ FROM {{catalog}}.{{prefix}}_gold.qry_calls c
 LEFT JOIN {{catalog}}.{{prefix}}_gold.qry_sale_value v ON v.Sales_Category = c.Intended_Category
 WHERE c.Lost_Sale_Flag = 1
 GROUP BY c.Month, c.Lost_Sale_Driver, c.Lost_Sale_Reason, c.Reason_Group, c.Intended_Category, c.Intended_Sale_Type;
-COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_lost_sales IS 'Answers: "Why are we losing sales?" and "Break down lost sales by driver and reason". A lost sale: the customer intended to buy and the sale did not close for an identified reason. Per month, driver (Customer, People, System), reason and intended category: lost sales, how many customers came back within 14 days and how many bought when they did, how many had a Jarvis error, and the estimated value (the average sale in that category, AUD). Over the data the drivers split Customer 43.3%, People 25.8%, System 30.9%, as Optus confirmed.';
+COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_lost_sales IS 'Answers: "Why are we losing sales?" and "Break down lost sales by driver and reason". A lost sale: the customer intended to buy and the sale did not close for a reason Optus could have fixed: People (discovery, ownership, transfers) or System (Jarvis, disconnects, IVR, lookups). When the customer could not or chose not to buy (failed credit check, ID verification, port-in account number, price, wants to think) it is a customer reason, not a lost sale: see Customer_No_Sale_Flag and Customer_No_Sale_Reason in qry_calls. Per month, driver (People, System), reason and intended category: lost sales, how many customers came back within 14 days and how many bought when they did, how many had a Jarvis error, and the estimated value (the average sale in that category, AUD). Optus''s own split (Customer 43.3%, People 25.8%, System 30.9%) includes customer reasons; without them it is People 45%, System 55%, as here.';
 
 -- 8. Jarvis: errors, the sales they cost, tickets.
 CREATE OR REPLACE VIEW {{catalog}}.{{prefix}}_gold.qry_jarvis_impact AS
@@ -313,7 +313,7 @@ SELECT 1 AS Scenario_ID, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls
 UNION ALL SELECT 2, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_Last_Full_Month = 1 AND Jarvis_Lost_Sale_Flag = 1
 UNION ALL SELECT 3, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_Last_Full_Month = 1 AND Unresolved_Sales_First_Call_Flag = 1
 UNION ALL SELECT 4, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_Last_Full_Month = 1 AND Avoidable_Transfer_Flag = 1
-UNION ALL SELECT 5, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_Last_Full_Month = 1 AND Lost_Sale_Driver = 'Customer';
+UNION ALL SELECT 5, Call_ID FROM {{catalog}}.{{prefix}}_gold.qry_calls WHERE Is_Last_Full_Month = 1 AND Customer_No_Sale_Flag = 1;
 COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_scenario_calls IS 'The calls in each scenario (Scenario_ID 1 to 5) in the last full month (September 2026). Join to qry_calls on Call_ID for the details. See qry_scenario_summary for what each scenario means.';
 
 CREATE OR REPLACE VIEW {{catalog}}.{{prefix}}_gold.qry_scenario_summary AS
@@ -332,18 +332,18 @@ WITH n AS (
 )
 SELECT g.Scenario_ID, g.Scenario_Name, g.Business_Question, g.Filter_Logic, n.Month, n.Calls, n.Customers,
        CASE g.Scenario_ID WHEN 1 THEN n.Calls * t.Take_Up * mob.Avg_First_12M_Revenue
-                          WHEN 4 THEN NULL ELSE n.Value_If_Sold END AS Est_First_12M_Value,
+                          WHEN 4 THEN NULL WHEN 5 THEN NULL ELSE n.Value_If_Sold END AS Est_First_12M_Value,
        CASE g.Scenario_ID WHEN 1 THEN 'Missed opportunities x observed take-up x average mobile sale'
-                          WHEN 4 THEN 'No sales value: an FCR measure' ELSE 'Average sale value of the intended category' END AS Value_Basis
+                          WHEN 4 THEN 'No sales value: an FCR measure' WHEN 5 THEN 'No sales value: customer reasons are not lost sales' ELSE 'Average sale value of the intended category' END AS Value_Basis
 FROM (VALUES
   (1, 'Missed Mobile Cross-Sell on NBN Sales', 'Home internet sales where the customer has no Optus mobile and the consultant did not offer one.', 'Sales_Category = Total Home - New Connection AND Cross_Sell_Opportunity_Flag = 1 AND Cross_Sell_Attempted_Flag = 0'),
   (2, 'Jarvis Errors Blocking Sales', 'Sales the customer wanted that a Jarvis error stopped.', 'Jarvis_Error_Flag = 1 AND Lost_Sale_Flag = 1'),
   (3, 'Lost Sales from Unresolved First Calls', 'First calls with a sales reason that did not close and brought the customer back within 14 days.', 'Repeat_14D_Flag = 1 AND Sales_Opportunity_Flag = 1 AND Sale_Flag = 0 AND Is_Repeat_Contact_Flag = 0'),
   (4, 'Avoidable Transfers', 'Transfers the consultant could have resolved: Retention without checking other plans, basic billing, a plan change.', 'Transfer_Valid_Flag = 0'),
-  (5, 'Customer Eligibility Blockers', 'Sales lost to a failed credit check, failed ID verification or a missing port-in account number.', 'Lost_Sale_Driver = Customer')
+  (5, 'Customer Reasons (Not Lost Sales)', 'Customers who wanted to buy but could not or chose not to: failed credit check, ID verification, no port-in account number, price, wants to think. Not counted as lost sales; a process to improve (e.g. ask for the port-in account number up front).', 'Customer_No_Sale_Flag = 1')
 ) AS g(Scenario_ID, Scenario_Name, Business_Question, Filter_Logic)
 LEFT JOIN n ON n.Scenario_ID = g.Scenario_ID CROSS JOIN t CROSS JOIN mob;
-COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_scenario_summary IS 'Answers: "Show the scenarios" and "How many calls are in each scenario?". The five scenarios of the Scenario Guide in the last full month (September 2026: 302, 115, 1,957, 730 and 288 calls), with customers and an estimated first-year value (Value_Basis says how; Scenario 4 has none). The calls are in qry_scenario_calls.';
+COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_scenario_summary IS 'Answers: "Show the scenarios" and "How many calls are in each scenario?". The five scenarios of the Scenario Guide in the last full month (September 2026), with customers and an estimated first-year value (Value_Basis says how; Scenarios 4 and 5 have none). The calls are in qry_scenario_calls.';
 
 -- 16. The recovery plan: how the last full month''s gap to target could close.
 CREATE OR REPLACE VIEW {{catalog}}.{{prefix}}_gold.qry_recovery_plan AS

@@ -88,15 +88,16 @@ const KPI_DICT = [
   ['Renewals conversion', 'Keeping customers.', 'Postpaid Voice and Home renewals ÷ handled calls. The 3.5% target is an assumption to confirm with Optus.'],
   ['Pace', 'Where the month is heading.', 'Month-to-date new sales scaled to the whole month by calendar days, against the target conversion on the month\'s calls. A straight line, not a forecast.'],
   ['Plan revenue', 'What the sales are worth.', 'Monthly plan price of everything sold (AUD); first-year revenue is the plan revenue over its first 12 months. Device repayments are not included.'],
-  ['Lost sale', 'Revenue that walked away.', 'The customer intended to buy and the sale did not close for an identified reason: Customer (credit check, ID, port-in), People (discovery, ownership, transfers) or System (Jarvis, disconnects, IVR, lookups).'],
+  ['Lost sale', 'Revenue that walked away.', 'The customer intended to buy and the sale did not close for a reason Optus could have fixed: People (discovery, ownership, transfers) or System (Jarvis, disconnects, IVR, lookups).'],
+  ['Customer reason', 'Not a lost sale.', 'The customer wanted to buy but couldn\'t or chose not to: failed credit check (Jarvis shows eligibility only, no score), failed ID verification, no port-in account number, price, or wants to think about it. Shown beside lost sales, not counted in them.'],
   ['Jarvis impact', 'Optus\'s 0.6-point problem.', 'Sales a Jarvis error stopped ÷ handled calls, in points of conversion. Ticket resolution days from the incident ticket.'],
   ['Cross-sell', 'The second sale.', 'On a sale call, an opportunity is a customer without the complementary Optus service (e.g. NBN without Optus mobile). Attempt rate = offered ÷ opportunities; take-up = sold ÷ offered.'],
   ['First contact resolution (FCR)', 'Did one call do it?', 'Answered calls not transferred and with no repeat call from the customer within 14 days ÷ answered calls.'],
   ['Avoidable transfer', 'Calls we could have kept.', 'A transfer the consultant could have resolved: sent to Retention without checking other plans, a basic billing question, a plan change.'],
   ['Won back', 'Is a lost sale really lost?', 'A lost sale whose customer called again within 14 days and bought on that call.'],
-  ['Coaching focus', 'Who to help first.', 'Consultants ranked on sale conversion over the last three months to date (August to 20 October, 150+ calls). The lowest quartile, furthest below the median, with their Elevate discovery score and cross-sell attempt rate.'],
+  ['Coaching focus (Explorer)', 'Who to help first.', 'Consultants ranked on sale conversion over the last three months to date (August to 20 October, 150+ calls). The lowest quartile, furthest below the median, with their Elevate discovery score and cross-sell attempt rate.'],
   ['Recovery plan', 'How the gap closes.', 'Gap = target conversion × calls this month − new sales this month. Levers: new sales Jarvis blocked; missed cross-sell opportunities × observed take-up; new sales lost to people causes × 50% (an assumption). Planning estimates, not forecasts.'],
-  ['Scenarios', 'The Scenario Guide.', '1 Missed mobile cross-sell on NBN sales. 2 Jarvis errors blocking sales. 3 Lost sales from unresolved first calls. 4 Avoidable transfers. 5 Customer eligibility blockers. Counts are for this month, with the last full month for reference.'],
+  ['Scenarios', 'The Scenario Guide.', '1 Missed mobile cross-sell on NBN sales. 2 Jarvis errors blocking sales. 3 Lost sales from unresolved first calls. 4 Avoidable transfers. 5 Customer reasons (not lost sales). Counts are for this month, with the last full month for reference.'],
 ];
 function openKpiDict() {
   document.getElementById('kpiDictBody').innerHTML = `<p class="score-reason">Optus telesales, 1 November 2025 to 20 October 2026 (synthetic demo data shaped to Optus's sales and the Concentrix FCR and conversion slides), amounts in Australian dollars. Every figure comes from certified views; no AI computes them.</p>
@@ -151,8 +152,8 @@ async function loadHome() {
   const o = (await overviewReq) || {};
   const steps = [
     () => renderExecSummary(summary, o), () => renderThisMonth(summary, o), () => renderLost(summary, o),
-    () => renderJarvis(summary, o), () => renderXsell(summary, o), () => renderFirstCall(summary, o),
-    () => renderCoaching(summary, o), () => renderRecovery(summary, o),
+    () => renderJarvis(summary, o), () => renderPeople(summary, o), () => renderXsell(summary, o), () => renderFirstCall(summary, o),
+    () => renderRecovery(summary, o), () => renderCoaching(summary, o),
   ];
   for (const fn of steps) { run(fn); await nextFrame(); }
   // Then the other tabs load in the background while the browser is idle, so they open
@@ -190,11 +191,11 @@ function renderHero(s) {
     ['Sales this month', count(s.MTD_New_Sales), `new sales · ${count(s.MTD_Renewal_Sales)} renewals · ${money(s.MTD_Monthly_Revenue)} a month in plan revenue` +
       refLine(`${hEsc(lfm)}: ${count(s.LFM_New_Sales)} new sales, ${count(s.LFM_Renewal_Sales)} renewals`), 'cart',
       viewBtn('mtd_sales', 'View sales', '', `Sales, ${cmSpan(s)}`, true)],
-    ['Target · new sales conversion', pct(target), `${hEsc(mtdMonth)} so far <b>${pct(s.MTD_New_Conversion)}</b> · <b>${count(stillNeeded)}</b> more new sales needed in ${count(s.Days_Left)} days (${pct(s.Needed_Rest_Conversion)})` +
+    ['New sales conversion', pct(s.MTD_New_Conversion), `target <b>${pct(target)}</b> · <b>${count(stillNeeded)}</b> more new sales needed in ${count(s.Days_Left)} days (${pct(s.Needed_Rest_Conversion)})` +
       refLine(`${hEsc(lfm)}: ${pct(s.LFM_New_Conversion)}`), 'target', ''],
-    ['Lost sales this month', count(s.MTD_Lost_Sales), `customers who wanted to buy · ${count(s.MTD_Jarvis_Lost_Sales)} stopped by Jarvis errors` +
-      refLine(`${hEsc(lfm)}: ${count(s.LFM_Lost_Sales)}`), 'alert',
-      viewBtn('mtd_lost', 'View lost sales', '', `Lost sales, ${cmSpan(s)}`, true)],
+    ['Sales stopped by Jarvis', count(s.MTD_Jarvis_Lost_Sales), `Jarvis errors this month · ${(num(s.MTD_Jarvis_Conversion_Impact) * 100).toFixed(1)} points of conversion` +
+      refLine(`${hEsc(lfm)}: ${count(s.LFM_Jarvis_Lost_Sales)}`), 'alert',
+      viewBtn('jarvis_lost', 'View blocked sales', '', `Sales stopped by Jarvis, ${cmSpan(s)}`, true)],
     ['FCR this month', pct(s.MTD_FCR_Rate), `target ${pct(s.Target_FCR)} (assumed)` + refLine(`${hEsc(lfm)}: ${pct(s.LFM_FCR_Rate)}`), 'check', ''],
   ].map(([l, v, sub, ic, view]) => `<div class="hs"><div class="hs-ico">${icon(ic)}</div><div><div class="hs-l">${l}</div><div class="hs-v">${v}</div><div class="hs-s">${sub}</div>${view}</div></div>`).join('');
   // Timestamps come from the warehouse in UTC; shown in the viewer's local time.
@@ -207,42 +208,34 @@ function renderHero(s) {
 /** Executive summary: the chapters in plain lines, plus a bottom line. Each line jumps to its chapter. */
 function renderExecSummary(s, o) {
   if (!(o.recovery || []).length) return;   // the overview hasn't arrived yet: the skeleton stays
-  const cm = cmName(s), lfm = lfmName(s), ref = o.ref || {};
+  const cm = cmName(s);
   const gap = num(lever(o, 0).New_Sales) || 0;
   const levers = [1, 2, 3].reduce((a, n) => a + (num(lever(o, n).New_Sales) || 0), 0);
-  const reasons = salesReasons(o);
-  const mobile = reasons.find(r => r.Call_Reason === 'New Mobile Plan / Port In') || {};
-  const nbn = reasons.find(r => r.Call_Reason === 'New NBN Service') || {};
-  const refMobile = (ref.reasons || []).find(r => r.Call_Reason === 'New Mobile Plan / Port In') || {};
-  const fc = cmRow(s, o.firstCall), fcRef = lfmRow(s, o.firstCall);
-  const hx = homeXsell(o), rx = ref.xsell || {};
-  const jarvisDays = sum(o.jarvis, 'Tickets') ? (o.jarvis || []).reduce((a, r) => a + num(r.Avg_Resolution_Days) * num(r.Tickets), 0) / sum(o.jarvis, 'Tickets') : null;
-  const coach = o.coaching || [];
+  const mobile = salesReasons(o).find(r => r.Call_Reason === 'New Mobile Plan / Port In') || {};
+  const hx = homeXsell(o);
+  const lostSales = sum(o.lostDrivers, 'Lost_Sales');
   const covered = gap > 0 ? levers / gap : null;
   const stillNeeded = Math.max(0, (num(s.Pace_Target_New_Sales) || 0) - (num(s.MTD_New_Sales) || 0));
   document.getElementById('execSumBottom').innerHTML = `<span class="es-bl">Bottom line</span>` + hEsc(covered !== null
-    ? `${cm} needs ${count(stillNeeded)} more new sales in ${count(s.Days_Left)} days. The sales are there: customers who wanted to buy were stopped by Jarvis, not asked for the second product, or not closed by the consultant. So far this month, fixing those three would have added about ${count(levers)} new sales, ${covered >= 0.95 ? 'enough to close' : `${pct(covered, 0)} of`} the ${count(gap)}-sale gap to target.`
+    ? `${cm} needs ${count(stillNeeded)} more new sales in ${count(s.Days_Left)} days to reach ${pct(s.Target_New_Conversion)}. The sales are there: ${count(lostSales)} customers who wanted to buy were lost to Jarvis or to how the call was handled. Fixing Jarvis, the cross-sell and discovery would have added about ${count(levers)} sales so far, ${covered >= 0.95 ? 'enough to close' : `${pct(covered, 0)} of`} the ${count(gap)}-sale gap.`
     : `New sales conversion is ${pct(s.MTD_New_Conversion)} in ${cm} so far.`);
+  // One line per chapter with its figure on the right; the detail and the reference month are in the chapter.
   const rows = [
-    ['ch1b', `${cm} so far`, `${count(s.MTD_New_Sales)} new sales from ${count(s.MTD_Calls)} calls: ${pct(s.MTD_New_Conversion)} against a ${pct(s.Target_New_Conversion)} target, ${count(gap)} sales short so far. ${count(stillNeeded)} more needed in ${count(s.Days_Left)} days (${pct(s.Needed_Rest_Conversion)}).`,
-      `${lfm}: ${pct(s.LFM_New_Conversion)}, ${count(refLever(o, 0).New_Sales)} short`, pct(s.MTD_New_Conversion), 'new sales conversion', 'bad'],
-    ['ch2', 'Where sales are lost', `Mobile is the biggest reason customers call (${count(mobile.Calls)} calls) but closes ${pct(mobile.Sale_Conversion)} of them, against ${pct(nbn.Sale_Conversion)} for new NBN. ${count(s.MTD_Lost_Sales)} customers who wanted to buy didn't.`,
-      `${lfm}: mobile ${pct(refMobile.Sale_Conversion)}, ${count(s.LFM_Lost_Sales)} lost sales`, pct(mobile.Sale_Conversion), 'mobile calls that sell', 'warn'],
-    ['ch3', 'Jarvis', `${count(s.MTD_Jarvis_Lost_Sales)} sales stopped by Jarvis errors (${(num(s.MTD_Jarvis_Conversion_Impact) * 100).toFixed(1)} points of conversion); tickets take ${jarvisDays === null ? '—' : jarvisDays.toFixed(1)} days on average.`,
-      `${lfm}: ${count(s.LFM_Jarvis_Lost_Sales)} sales stopped`, count(s.MTD_Jarvis_Lost_Sales), 'sales blocked', 'bad'],
-    ['ch4', 'Cross-sell', `${count(hx.notOffered)} of ${count(hx.sales)} home internet sales had no mobile offered; when it is offered, ${pct(hx.takeUp, 0)} say yes.`,
-      `${lfm}: ${count(rx.Not_Offered)} of ${count(rx.Sale_Calls)} not offered`, count(hx.notOffered), 'NBN sales, no mobile offer', 'warn'],
-    ['ch5', 'The first call', `Of ${count(fc.Lost_Sales)} lost sales, only ${count(fc.Lost_Bought_On_Return)} were won back; ${count(fc.Callbacks_Chased)} of ${count(fc.Callbacks_Promised)} promised callbacks ended with the customer calling us.`,
-      `${lfm}: ${count(fcRef.Lost_Bought_On_Return)} of ${count(fcRef.Lost_Sales)} won back`, pct(num(fc.Lost_Bought_On_Return) / num(fc.Lost_Sales), 0), 'of lost sales won back', 'bad'],
-    ['ch6', 'Coaching', coach.length ? `${count(coach.length)} consultants furthest below the median convert ${pct(Math.min(...coach.map(r => num(r.Sale_Conversion))), 1)} to ${pct(Math.max(...coach.map(r => num(r.Sale_Conversion))), 1)} of calls, against ${pct(coach[0].Median_Sale_Conversion)} (August to ${asOfDate(s.as_of).replace(/ \d{4}$/, '')}).` : 'No consultant is flagged.',
-      '', count(sum(coach, 'Sales_Below_Median')), 'sales below median (3 months)', 'brand'],
-    ['ch7', 'Closing the gap', `Fix Jarvis (${count(lever(o, 1).New_Sales)}), offer the cross-sell (${count(lever(o, 2).New_Sales)}) and coach discovery (${count(lever(o, 3).New_Sales)}): about ${count(levers)} new sales so far this month against a gap of ${count(gap)}.`,
-      `${lfm}: ${count([1, 2, 3].reduce((a, n) => a + (num(refLever(o, n).New_Sales) || 0), 0))} against a gap of ${count(refLever(o, 0).New_Sales)}`, count(levers), 'new sales so far', 'good'],
+    ['ch1b', 'Are we on target?', `${count(s.MTD_New_Sales)} new sales from ${count(s.MTD_Calls)} calls: ${pct(s.MTD_New_Conversion)} against a ${pct(s.Target_New_Conversion)} target, ${count(gap)} sales short so far.`,
+      pct(s.MTD_New_Conversion), 'new sales conversion', 'bad'],
+    ['ch2', 'Where sales are lost', `Mobile is the biggest reason customers call (${count(mobile.Calls)} calls) but closes only ${pct(mobile.Sale_Conversion)} of them.`,
+      pct(mobile.Sale_Conversion), 'of mobile calls sell', 'warn'],
+    ['ch3', 'Systems: Jarvis', `Jarvis errors stopped ${count(s.MTD_Jarvis_Lost_Sales)} sales customers wanted to buy.`,
+      count(s.MTD_Jarvis_Lost_Sales), 'sales blocked', 'bad'],
+    ['ch4', 'People: the call', `${count(hx.notOffered)} of ${count(hx.sales)} home internet sales had no mobile offered.`,
+      count(hx.notOffered), 'NBN sales, no mobile offer', 'warn'],
+    ['ch5', 'Closing the gap', `Fixing Jarvis, the cross-sell and discovery would have added about ${count(levers)} new sales so far, against a gap of ${count(gap)}.`,
+      count(levers), 'new sales so far', 'good'],
   ];
-  document.getElementById('execSumList').innerHTML = rows.map(([id, label, line, refTxt, fig, figLabel, tone], i) => `
+  document.getElementById('execSumList').innerHTML = rows.map(([id, label, line, fig, figLabel, tone], i) => `
     <li><a class="es-row" href="#${id}">
       <span class="es-n">${i + 1}</span>
-      <span class="es-text"><span class="es-label">${hEsc(label)}</span><span class="es-line">${hEsc(line)}</span>${refTxt ? refLine(hEsc(refTxt)) : ''}</span>
+      <span class="es-text"><span class="es-label">${hEsc(label)}</span><span class="es-line">${hEsc(line)}</span></span>
       <span class="es-fig es-${tone}"><b>${fig}</b><small>${hEsc(figLabel)}</small></span>
     </a></li>`).join('');
 }
@@ -334,7 +327,7 @@ function renderLost(s, o) {
   const nbn = reasons.find(r => r.Call_Reason === 'New NBN Service') || {};
   const refOf = name => (ref.reasons || []).find(r => r.Call_Reason === name) || {};
   const total = sum(o.reasons, 'Calls');
-  const drivers = ['Customer', 'People', 'System'].map(d => {
+  const drivers = ['People', 'System'].map(d => {
     const rows = (o.lostDrivers || []).filter(r => r.Lost_Sale_Driver === d).sort((a, b) => num(b.Lost_Sales) - num(a.Lost_Sales));
     return { d, rows, lost: sum(rows, 'Lost_Sales'), value: sum(rows, 'Value_Lost') };
   });
@@ -342,9 +335,14 @@ function renderLost(s, o) {
   const refDrivers = ref.drivers || [];
   const refLost = sum(refDrivers, 'Lost_Sales');
   const refShare = d => { const r = refDrivers.find(x => x.Lost_Sale_Driver === d); return r && refLost ? num(r.Lost_Sales) / refLost : null; };
+  const dName = d => (d === 'System' ? 'Systems' : 'People');
+  const cust = o.customerReasons || [];
+  const custN = sum(cust, 'Calls');
+  const custLabel = r => String(r.Customer_No_Sale_Reason || '').replace('Port-in: previous provider account number unavailable', 'no port-in account number').toLowerCase();
   setTake('ch2Take', `<b>${hEsc(top.Call_Reason || '')}</b> is the biggest reason customers call (${pct(num(top.Calls) / total, 0)} of calls) but only <b>${pct(top.Sale_Conversion)}</b> of those calls sell, ` +
     `against ${pct(nbn.Sale_Conversion)} for new NBN and ${pct(best.Sale_Conversion)} for ${hEsc(String(best.Call_Reason || '').toLowerCase())}. ` +
-    `<b>${count(lost)}</b> customers who wanted to buy didn't: ${drivers.map(x => `${hEsc(x.d.toLowerCase())} ${pct(x.lost / lost, 0)}`).join(', ')}.` +
+    `<b>${count(lost)}</b> customers who wanted to buy were lost for reasons we can fix: ${drivers.slice().sort((a, b) => b.lost - a.lost).map(x => `${hEsc(dName(x.d).toLowerCase())} ${pct(x.lost / lost, 0)}`).join(', ')}. ` +
+    `The next two chapters take each in turn.` +
     refLine(`${hEsc(lfm)}: mobile ${pct(refOf(top.Call_Reason).Sale_Conversion)}, ${count(refLost)} lost sales.`));
   const maxC = Math.max(...reasons.map(r => num(r.Sale_Conversion) || 0), 0.01) * 1.08;
   const avg = sum(reasons, 'Sale_Calls') / (sum(reasons, 'Calls') || 1);
@@ -356,13 +354,14 @@ function renderLost(s, o) {
       avg, `Sales calls ${pct(avg)}`)).join('') +
     `<div class="panel-note">Each bar: calls with that reason that closed at least one sale ÷ calls with that reason. Service calls (billing, order status, relocation) are left out; they rarely sell.</div>`);
   const maxL = Math.max(...drivers.map(x => x.lost), 1) * 1.05;
-  const tone = { Customer: 'warn', People: 'bad', System: 'bad' };
   panel('pnlDrivers', 'Why customers who wanted to buy didn\'t', `${hEsc(span)}: ${count(lost)} lost sales worth about ${money(drivers.reduce((a, x) => a + x.value, 0))} in first-year revenue.`,
-    { q: 'Break down lost sales by driver and reason this month, and which ones we can fix ourselves.', mode: 'agent' },
-    drivers.map(x => bar(`<b>${hEsc(x.d)}</b>`, x.lost, maxL, `${count(x.lost)} · ${pct(x.lost / lost, 0)}`, tone[x.d],
+    { q: 'Break down lost sales by driver and reason this month, and which ones to fix first.', mode: 'agent' },
+    drivers.map(x => bar(`<b>${hEsc(dName(x.d))}</b>`, x.lost, maxL, `${count(x.lost)} · ${pct(x.lost / lost, 0)}`, 'bad',
       x.rows.slice(0, 3).map(r => `${hEsc(r.Lost_Sale_Reason)} (${count(r.Lost_Sales)})`).join(' · ') + ` · ${hEsc(lfm)} ${pct(refShare(x.d), 0)} ` +
-      viewBtn('driver', 'View', x.d, `Lost sales: ${x.d.toLowerCase()} causes, ${span}`, true))).join('') +
-    `<div class="panel-note">A lost sale: the customer intended to buy and it didn't close for an identified reason. Optus confirmed the split: Customer 43.3%, People 25.8%, System 30.9%. People and System causes are ours to fix; Customer causes (credit check, ID, port-in account number) need a better process.</div>`);
+      viewBtn('driver', 'View', x.d, `Lost sales: ${dName(x.d).toLowerCase()} causes, ${span}`, true))).join('') +
+    (custN ? `<div class="cust-reasons"><b>Not counted as lost: ${count(custN)} customer reasons.</b> The customer couldn't or chose not to buy: ${cust.slice(0, 5).map(r => `${hEsc(custLabel(r))} (${count(r.Calls)})`).join(' · ')}. ` +
+      `A process to improve (for example, ask for the port-in account number up front), not a lost sale. ${viewBtn('customer_no_sale', 'View', '', `Customer reasons (not lost sales), ${span}`, true)}</div>` : '') +
+    `<div class="panel-note">A lost sale: the customer intended to buy and it didn't close for a reason we could have fixed. Optus's slide split (Customer 43.3%, People 25.8%, System 30.9%) includes customer reasons; without them it is People 45%, Systems 55%.</div>`);
 }
 
 /** 3. What is Jarvis costing us? */
@@ -401,16 +400,30 @@ function renderJarvis(s, o) {
   });
 }
 
-/** 4. Are we asking for the second sale? */
+/** 4. People: are consultants making the most of every call? One answer for the chapter. */
+function renderPeople(s, o) {
+  const span = cmSpan(s), lfm = lfmName(s);
+  const people = (o.lostDrivers || []).filter(r => r.Lost_Sale_Driver === 'People').sort((a, b) => num(b.Lost_Sales) - num(a.Lost_Sales));
+  const hx = homeXsell(o), rx = (o.ref || {}).xsell || {};
+  const fc = cmRow(s, o.firstCall), fcRef = lfmRow(s, o.firstCall);
+  const tr = o.transfers || [], rt = (o.ref || {}).transfers || {};
+  const avoid = sum(tr.filter(r => r.Transfer_Validity === 'Avoidable'), 'Transfers');
+  const refPeople = sum(((o.ref || {}).drivers || []).filter(r => r.Lost_Sale_Driver === 'People'), 'Lost_Sales');
+  const short = r => String(r.Lost_Sale_Reason).split(' - ')[0].toLowerCase();
+  setTake('ch4Take', `<b>${count(sum(people, 'Lost_Sales'))}</b> sales in ${hEsc(span)} were lost to how the call was handled: ${people.slice(0, 2).map(r => `${hEsc(short(r))} (${count(r.Lost_Sales)})`).join(', ')}. ` +
+    `<b>${count(hx.notOffered)}</b> of ${count(hx.sales)} home internet sales had no mobile offered, though <b>${pct(hx.takeUp, 0)}</b> say yes when asked. ` +
+    `<b>${count(fc.Callbacks_Chased)}</b> of ${count(fc.Callbacks_Promised)} promised callbacks were left to the customer, and <b>${count(avoid)}</b> transfers were avoidable. ` +
+    `A sale missed on the first call is rarely won later: <b>${count(fc.Lost_Bought_On_Return)}</b> of ${count(fc.Lost_Sales)} lost sales were won back.` +
+    refLine(`${hEsc(lfm)}: ${count(refPeople)} lost to people causes; ${count(rx.Not_Offered)} of ${count(rx.Sale_Calls)} NBN sales without a mobile offer; ${count(fcRef.Callbacks_Chased)} of ${count(fcRef.Callbacks_Promised)} callbacks chased; ${count(rt.Avoidable)} avoidable transfers.`));
+}
+
+/** 4a. Are we asking for the second sale? */
 function renderXsell(s, o) {
   const span = cmSpan(s), lfm = lfmName(s);
-  const hx = homeXsell(o), rx = (o.ref || {}).xsell || {};
+  const hx = homeXsell(o);
   const sc1 = scenario(o, 1);
   const target = ruleVal(s, 'target_xsell_attempt', 0.6);
-  setTake('ch4Take', `We sold <b>${count(hx.sales)}</b> home internet plans in ${hEsc(span)}. <b>${count(hx.opp)}</b> of those customers had no Optus mobile, and <b>${count(hx.notOffered)}</b> were never offered one. ` +
-    `When consultants do offer it, <b>${pct(hx.takeUp, 0)}</b> say yes: offering the mobile on these alone is worth ${money(sc1.Est_First_12M_Value)} of first-year revenue, and offering the cross-sell on every eligible sale about <b>${count(lever(o, 2).New_Sales)}</b> more sales so far this month. ` +
-    `Cross-sell only started in August and consultants are still in training: this is the cheapest way to fix mobile.` +
-    refLine(`${hEsc(lfm)}: ${count(rx.Not_Offered)} of ${count(rx.Sale_Calls)} not offered; ${pct(num(rx.Attempted) / num(rx.Opportunities), 0)} of opportunities offered.`));
+  const rx = (o.ref || {}).xsell || {};
   const steps = [
     ['Home internet sales', hx.sales, 'brand', ''],
     ['Customer has no Optus mobile', hx.opp, 'brand', `${pct(hx.opp / hx.sales, 0)} of sales`],
@@ -432,7 +445,7 @@ function renderXsell(s, o) {
     `<div class="panel-note">Every team is well below target, so this is a training and prompt gap, not one team's problem. Team lead names are synthetic.</div>`);
 }
 
-/** 5. What happens when the first call doesn't close? */
+/** 4b. What happens when the first call doesn't close? */
 function renderFirstCall(s, o) {
   const span = cmSpan(s), lfm = lfmName(s);
   const fc = cmRow(s, o.firstCall), fcRef = lfmRow(s, o.firstCall);
@@ -442,11 +455,6 @@ function renderFirstCall(s, o) {
   const total = sum(tr, 'Transfers');
   const avoid = sum(tr.filter(r => r.Transfer_Validity === 'Avoidable'), 'Transfers');
   const fromSales = sum(tr.filter(r => r.Call_Type === 'Sales call'), 'Transfers');
-  const uplift = num(m.Answered_Calls) ? avoid / num(m.Answered_Calls) : null;
-  setTake('ch5Take', `The first call is the only call. Of <b>${count(fc.Lost_Sales)}</b> lost sales in ${hEsc(span)}, ${count(fc.Lost_Came_Back)} customers called back but only <b>${count(fc.Lost_Bought_On_Return)}</b> bought. ` +
-    `Customers calling again convert at <b>${pct(fc.Repeat_Contact_Conversion)}</b> against ${pct(fc.First_Contact_Conversion)} on a first call. ` +
-    `<b>${count(fc.Callbacks_Chased)}</b> of ${count(fc.Callbacks_Promised)} promised callbacks ended with the customer calling us, and <b>${count(avoid)}</b> transfers were avoidable (about ${uplift === null ? '—' : (uplift * 100).toFixed(1)} points of FCR).` +
-    refLine(`${hEsc(lfm)}: ${count(fcRef.Lost_Bought_On_Return)} of ${count(fcRef.Lost_Sales)} lost sales won back; ${count(fcRef.Callbacks_Chased)} of ${count(fcRef.Callbacks_Promised)} callbacks chased; ${count(rt.Avoidable)} avoidable transfers.`));
   const maxF = Math.max(num(fc.Lost_Sales) || 0, 1);
   panel('pnlFirstCall', 'Lost on the first call, lost for good', `${hEsc(span)}: what happened to customers we didn't sell to.`,
     { q: 'Do customers we lose come back and buy? What should consultants do differently on the first call?', mode: 'agent' },
@@ -478,7 +486,7 @@ function renderFirstCall(s, o) {
     `<div class="panel-note">As on the Concentrix FCR slide, Retention is the top destination. Consultants sending customers to Retention before checking other plans is the biggest avoidable reason.</div>`);
 }
 
-/** 6. Who needs coaching, and on what? (The last three months to date, so the ranking has enough calls.) */
+/** Who needs coaching, and on what? Shown in Explorer (the last three months to date, so the ranking has enough calls). */
 function renderCoaching(s, o) {
   const rows = o.coaching || [];
   const first = rows[0] || {};
@@ -487,7 +495,7 @@ function renderCoaching(s, o) {
   const tenured = tenure.filter(r => !String(r.Tenure_Band).startsWith('Nesting'));
   const tenuredConv = sum(tenured, 'Calls') ? tenured.reduce((a, r) => a + num(r.Sale_Conversion) * num(r.Calls), 0) / sum(tenured, 'Calls') : null;
   const span = first.Window_Start ? `${monthName(first.Window_Start)} to ${asOfDate(s.as_of)}` : 'the last three months';
-  setTake('ch6Take', rows.length
+  setTake('coachTake', rows.length
     ? `Over ${hEsc(span)}, the median consultant closed a sale on <b>${pct(first.Median_Sale_Conversion)}</b> of calls. The ${count(rows.length)} furthest below it ` +
       `would have made about <b>${count(sum(rows, 'Sales_Below_Median'))}</b> more sales at the median. Most have low Elevate discovery scores: the "irrelevant plan recommendation" Optus described. ` +
       (nest.Calls ? `New starters in nesting convert <b>${pct(nest.Sale_Conversion)}</b> against ${pct(tenuredConv)} for everyone else.` : '') +
@@ -510,7 +518,7 @@ function renderCoaching(s, o) {
     `<div class="grid two flat-grid">${tenure.map(r => bar(hEsc(r.Tenure_Band), num(r.Sale_Conversion), maxT, pct(r.Sale_Conversion), String(r.Tenure_Band).startsWith('Nesting') ? 'warn' : 'brand', `${count(r.Calls)} calls · new sales ${pct(r.New_Conversion)}`)).join('')}</div>`);
 }
 
-/** 7. How do we close the gap to target? The recovery plan and the Scenario Guide, this month. */
+/** 5. How do we close the gap to target? The recovery plan and the Scenario Guide, this month. */
 function renderRecovery(s, o) {
   const span = cmSpan(s), lfm = lfmName(s);
   const gap = lever(o, 0);
@@ -519,7 +527,7 @@ function renderRecovery(s, o) {
   const value = levers.reduce((a, r) => a + (num(r.Est_First_12M_Value) || 0), 0);
   const g = num(gap.New_Sales) || 0;
   const refTotal = [1, 2, 3].reduce((a, n) => a + (num(refLever(o, n).New_Sales) || 0), 0);
-  setTake('ch7Take', `In ${hEsc(span)} we are <b>${count(g)}</b> new sales short of the ${pct(s.Target_New_Conversion)} target so far. Three fixes, each with an owner, would have added about <b>${count(total)}</b> ` +
+  setTake('ch5Take', `In ${hEsc(span)} we are <b>${count(g)}</b> new sales short of the ${pct(s.Target_New_Conversion)} target so far. Three fixes, each with an owner, would have added about <b>${count(total)}</b> ` +
     `(${money(value)} of first-year revenue)${g ? `: ${total >= g * 0.95 ? '<b>enough to close the gap</b>' : `<b>${pct(total / g, 0)}</b> of the gap`}` : ''}. ` +
     `The month still needs <b>${count(Math.max(0, (num(s.Pace_Target_New_Sales) || 0) - (num(s.MTD_New_Sales) || 0)))}</b> new sales in ${count(s.Days_Left)} days.` +
     refLine(`${hEsc(lfm)}: ${count(refLever(o, 0).New_Sales)} short; the same fixes were worth ${count(refTotal)}.`));
@@ -533,13 +541,13 @@ function renderRecovery(s, o) {
   panel('pnlRecovery', 'The recovery plan', `${hEsc(span)}: what each fix would have added in new sales, against the gap to target so far.`,
     { q: 'How do we close the gap to the new sales conversion target this month? Rank the levers and say who owns each.', mode: 'agent' },
     stack + `<div class="table-scroll flat">${table}</div>` +
-    `<div class="panel-note">Planning estimates, not forecasts. Jarvis: new sales its errors stopped. Cross-sell: opportunities not offered × the observed take-up. Coaching: new sales lost to people causes × 50% (an assumption to agree with the team leads).</div>`);
+    `<div class="panel-note">Planning estimates, not forecasts. Jarvis: new sales its errors stopped (chapter 3). Cross-sell: opportunities not offered × the observed take-up (chapter 4). Coaching: new sales lost to people causes × 50%, an assumption to agree with the team leads; who to coach first is in Explorer.</div>`);
   const asks = {
     1: 'Which consultants missed the mobile cross-sell on NBN sales most often this month?',
     2: 'Which Jarvis errors blocked sales this month, and how long did their tickets take?',
     3: 'Which first calls with a sales reason didn\'t close this month and brought the customer back, and why?',
     4: 'Which transfers this month were avoidable, and which consultants made them?',
-    5: 'Which states and products lose most sales to failed credit checks, ID checks and port-in issues this month?',
+    5: 'Which customer reasons (credit check, ID, port-in account number, price) stopped customers buying this month, and what process would help?',
   };
   document.getElementById('scenarios').innerHTML = (o.scenarios || []).map(x => `<div class="card scen"><div class="scen-n">Scenario ${hEsc(x.Scenario_ID)}</div><div class="scen-t">${hEsc(x.Scenario_Name)}</div>
       <div class="scen-v">${count(x.Calls)}<small>calls</small></div>
@@ -555,6 +563,7 @@ const LIST_RULES = {
   mtd_sales: 'Calls this month so far that closed at least one sale.',
   mtd_lost: 'Calls this month so far where a customer who wanted to buy didn\'t.',
   driver: 'Lost sales this month so far with this driver.',
+  customer_no_sale: 'Customers this month so far who wanted to buy but couldn\'t or chose not to (credit check, ID, port-in account number, price, wants to think). Not counted as lost sales.',
   reason: 'Lost sales this month so far with this reason.',
   call_reason_lost: 'Calls with this reason this month so far that did not close a sale (lost sales first).',
   jarvis_lost: 'Sales a Jarvis error stopped this month so far, longest ticket first.',

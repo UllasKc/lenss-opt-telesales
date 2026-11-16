@@ -298,7 +298,7 @@
       ask('Break down lost sales by driver and reason, and which ones we can fix ourselves', 'agent'),
       rows.length ? rows.sort((a, b) => num(b.calls) - num(a.calls)).map(r => bar(hEsc(r.k), num(r.calls), max, `${count(r.calls)} · ${pct(num(r.calls) / num(t.lost_sales), 0)}`, tone[r.k] || 'brand',
         `${count(r.jarvis_lost)} with a Jarvis error ${xpView({ driver: r.k }, `Lost sales: ${r.k}`)}`)).join('') +
-        '<div class="panel-note">A lost sale: the customer intended to buy and it didn\'t close for an identified reason.</div>' : '<div class="empty-note">No lost sales in this view.</div>');
+        '<div class="panel-note">A lost sale: the customer intended to buy and it didn\'t close for a reason we could have fixed (People or System). Customer reasons (failed credit check, ID, port-in account number, price) are not counted.</div>' : '<div class="empty-note">No lost sales in this view.</div>');
   }
 
   // ---- the monthly trend of this view (every filter but the month)
@@ -441,7 +441,8 @@
     const total = num((d.totals || {}).calls) || 0;
     const searchHad = document.activeElement && document.activeElement.id === 'xpSearch';
     const tagFor = r => (r.Sales_Category ? `<span class="xp-tag ok">${hEsc(r.Sales_Category)}</span>`
-      : r.Lost_Sale_Driver ? `<span class="xp-tag bad">${hEsc(r.Lost_Sale_Driver)}: ${hEsc(r.Lost_Sale_Reason)}</span>` : '');
+      : r.Lost_Sale_Driver ? `<span class="xp-tag bad">${hEsc(r.Lost_Sale_Driver)}: ${hEsc(r.Lost_Sale_Reason)}</span>`
+      : r.Customer_No_Sale_Reason ? `<span class="xp-tag warn">Customer reason: ${hEsc(r.Customer_No_Sale_Reason)}</span>` : '');
     el.innerHTML = `<div class="panel-head"><div><div class="xs-kicker">Layer 2 · call records</div><h3>Calls behind the numbers</h3>
         <div class="panel-sub">${all.length < (d.calls || []).length ? `${count(all.length)} of ` : ''}${count((d.calls || []).length)} calls, sales and lost sales first${total > (d.calls || []).length ? ` (of ${count(total)} in this view)` : ''}</div></div>
       <div class="xs-ctl">
@@ -472,7 +473,7 @@
     const rows = callRowsFiltered();
     if (!rows.length) return;
     const cols = ['Call_ID', 'Call_Start', 'Month', 'Agent_ID', 'Team_Lead', 'Tenure_Band', 'Customer_ID', 'Customer_Type', 'State', 'Call_Direction',
-      'Call_Reason', 'Call_Result', 'Sales_Category', 'New_Sales', 'Renewal_Sales', 'Monthly_Revenue', 'Lost_Sale_Driver', 'Lost_Sale_Reason',
+      'Call_Reason', 'Call_Result', 'Sales_Category', 'New_Sales', 'Renewal_Sales', 'Monthly_Revenue', 'Lost_Sale_Driver', 'Lost_Sale_Reason', 'Customer_No_Sale_Reason',
       'Jarvis_Error_Flag', 'Jarvis_Error_Type', 'Cross_Sell_Outcome', 'Transfer_Destination', 'Transfer_Valid_Flag', 'FCR_Outcome', 'Handle_Time_Seconds'];
     const cell = v => { const x = String(v ?? ''); return /[",\n]/.test(x) ? `"${x.replace(/"/g, '""')}"` : x; };
     const sc = scopeText();

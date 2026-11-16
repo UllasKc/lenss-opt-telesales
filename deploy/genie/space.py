@@ -64,9 +64,13 @@ CALCULATION RULES
   was not transferred and the customer did not call again within {{rule:repeat_window_days}} days. Calls in the last
   {{rule:repeat_window_days}} days are unlocked (FCR_Locked_Flag = 0): their FCR can still fall. FCR_Outcome is
   Achieved, Repeat, Transfer or Transfer & Repeat.
-- Lost sale: the customer intended to buy and it did not close for an identified reason. Lost_Sale_Driver
-  is Customer, People or System (Optus: the 30.9% that is not customer or people is system error);
-  Lost_Sale_Reason gives the detail.
+- Lost sale: the customer intended to buy and it did not close for a reason Optus could have fixed.
+  Lost_Sale_Driver is People (discovery, ownership, transfers) or System (Jarvis, disconnects, IVR,
+  lookups); Lost_Sale_Reason gives the detail. When the customer could not or chose not to buy (failed
+  credit check, ID verification, no port-in account number, price, wants to think) it is NOT a lost sale:
+  Customer_No_Sale_Flag = 1 and Customer_No_Sale_Reason gives the reason. Optus's slide split
+  (Customer 43.3%, People 25.8%, System 30.9%) includes those customer reasons; without them it is about
+  People 45%, System 55%. Say so if someone quotes Optus's split.
 - Call_Result is Sale, Callback, No Answer or Rejected (no sale): the four outcomes Optus records.
   Transfers, Jarvis errors and eligibility are in their own columns.
 - Cross-sell is new: it started in August 2026 and consultants are in training. There is no cross-sell
@@ -82,7 +86,7 @@ SCENARIOS (the Scenario Guide; counts are for the last full month in qry_scenari
 2. Jarvis Errors Blocking Sales: Jarvis_Error_Flag = 1 AND Lost_Sale_Flag = 1.
 3. Lost Sales from Unresolved First Calls: first calls with a sales reason, no sale, and a repeat within 14 days.
 4. Avoidable Transfers: Transfer_Valid_Flag = 0.
-5. Customer Eligibility Blockers: Lost_Sale_Driver = Customer (credit check, ID verification, port-in account number).
+5. Customer Reasons (Not Lost Sales): Customer_No_Sale_Flag = 1 (credit check, ID verification, port-in account number, price, wants to think).
 The calls in each scenario are in qry_scenario_calls (join qry_calls on Call_ID).
 The Command Center shows the scenarios and the recovery plan for this month (Is_MTD = 1): for a scenario count
 or the gap to target "this month", apply the same rules to qry_calls WHERE Is_MTD = 1.
@@ -144,7 +148,7 @@ def examples(g: str):
          f"SELECT MTD_Jarvis_Lost_Sales, MTD_Calls, 100.0*MTD_Jarvis_Lost_Sales/MTD_Calls AS Conversion_Impact_Points, LFM_Jarvis_Lost_Sales, 100.0*LFM_Jarvis_Conversion_Impact AS Last_Month_Impact_Points FROM {g}.qry_cc_kpis;"),
         ("What is the average Jarvis ticket resolution time by error type?",
          f"SELECT Jarvis_Error_Type, SUM(Tickets) AS Tickets, SUM(Avg_Resolution_Days*Tickets)/SUM(Tickets) AS Avg_Resolution_Days, MAX(Max_Resolution_Days) AS Max_Resolution_Days, SUM(Lost_Sales) AS Lost_Sales FROM {g}.qry_jarvis_impact GROUP BY Jarvis_Error_Type ORDER BY Lost_Sales DESC;"),
-        ("Break down lost sales by driver (Customer, People, System) and reason.",
+        ("Break down lost sales by driver (People, System) and reason.",
          f"SELECT Lost_Sale_Driver, Lost_Sale_Reason, SUM(Lost_Sales) AS Lost_Sales, SUM(Est_First_12M_Value_Lost) AS Est_First_12M_Value_Lost FROM {g}.qry_lost_sales WHERE Month = (SELECT Last_Full_Month FROM {g}.qry_cc_kpis) GROUP BY Lost_Sale_Driver, Lost_Sale_Reason ORDER BY Lost_Sales DESC;"),
         ("Which states have the highest failed credit check rate on new connections?",
          f"SELECT State, COUNT(*) AS Credit_Checks, SUM(CASE WHEN Credit_Check_Result = 'Not eligible' THEN 1 ELSE 0 END) AS Not_Eligible, 1.0*SUM(CASE WHEN Credit_Check_Result = 'Not eligible' THEN 1 ELSE 0 END)/COUNT(*) AS Not_Eligible_Rate FROM {g}.qry_calls WHERE Intended_Sale_Type = 'New sale' AND Credit_Check_Result IN ('Eligible', 'Eligible after referral', 'Not eligible') GROUP BY State HAVING COUNT(*) >= 100 ORDER BY Not_Eligible_Rate DESC;"),

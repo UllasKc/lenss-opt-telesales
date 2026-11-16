@@ -62,7 +62,7 @@ export const LIBRARY: Array<{ category: string; items: Array<{ q: string; tag: s
     { q: 'Show weekly conversion for Postpaid Voice and Home new connections over the last 8 weeks.', tag: 'weekly', mode: 'chat' },
     { q: 'Which product categories sold most this month, and what monthly revenue did they bring?', tag: 'mix', mode: 'chat' },
     { q: 'Which call reasons convert best and worst this month?', tag: 'call reasons', mode: 'chat' },
-    { q: 'Break down lost sales by driver (Customer, People, System) and reason.', tag: 'lost sales', mode: 'chat' },
+    { q: 'Break down lost sales by driver (People, System) and reason.', tag: 'lost sales', mode: 'chat' },
   ] },
   { category: 'Systems and process', items: [
     { q: 'How many sales were lost to Jarvis errors this month, and what is the conversion impact in points?', tag: 'Jarvis', mode: 'chat' },
