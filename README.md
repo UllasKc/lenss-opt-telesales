@@ -21,7 +21,7 @@ Five chapters, one story: are we on target, where are sales lost, the systems ca
 2. **Where sales are lost:** "New Mobile Plan / Port In" is the biggest reason customers call, but only 5.4% of those calls sell, against 14.8% for new NBN. 245 customers who wanted to buy were lost to causes Optus can fix: Systems 54%, People 46%. A **lost sale** counts only People and System causes. Customer reasons (failed credit check, ID, port-in account number, price: 172 in October) are shown beside lost sales but not counted. Optus's 43.3 / 25.8 / 30.9 split includes them; without them it is People 45%, System 55%.
 3. **Systems: Jarvis:** Jarvis errors stopped 65 sales (0.6 points, as Optus reported); error calls take twice as long.
 4. **People: the call:** 113 sales lost to discovery, ownership and transfers; 172 of 296 home internet sales had no mobile offered (cross-sell is new since August and the team is in training); 295 of 765 promised callbacks were left to the customer; 509 transfers were avoidable.
-5. **Closing the gap:** fixing Jarvis, the cross-sell and discovery would have added about 172 new sales so far, more than the 118-sale gap.
+5. **Closing the gap:** fixing Jarvis, the cross-sell and discovery would have added about 165 new sales so far, more than the 118-sale gap.
 
 Who to coach first (the consultants furthest below the median, over the last three months) is at the bottom of the Explorer tab.
 

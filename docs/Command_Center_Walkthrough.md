@@ -8,7 +8,7 @@ The Command Center is the app's home page. It tells **one story in five chapters
 2. **Where are sales lost?** Mobile calls, and 245 customers who wanted to buy, lost to systems or people.
 3. **Systems:** Jarvis errors stopped 65 sales.
 4. **People:** the call itself, covering discovery, the mobile cross-sell, callbacks and transfers.
-5. **Closing the gap:** fixing Jarvis, the cross-sell and discovery would have added about 172 sales, more than the 118-sale gap.
+5. **Closing the gap:** fixing Jarvis, the cross-sell and discovery would have added about 165 sales, more than the 118-sale gap.
 
 "Today" in the data is **Tue 20 Oct 2026**. Every chapter shows **this month so far: 1–20 October 2026**. September 2026, the last full month, appears only in small grey reference lines.
 
@@ -52,9 +52,9 @@ A yellow **Synthetic data** tag sits at the bottom of the banner: "Demo data sha
 | 2 | **Where sales are lost:** Mobile is the biggest reason customers call (1,529 calls) but closes only 5.4% of them. | **5.4%** of mobile calls sell |
 | 3 | **Systems: Jarvis:** Jarvis errors stopped 65 sales customers wanted to buy. | **65** sales blocked |
 | 4 | **People: the call:** 172 of 296 home internet sales had no mobile offered. | **172** NBN sales, no mobile offer |
-| 5 | **Closing the gap:** Fixing Jarvis, the cross-sell and discovery would have added about 172 new sales so far, against a gap of 118. | **172** new sales so far |
+| 5 | **Closing the gap:** Fixing Jarvis, the cross-sell and discovery would have added about 165 new sales so far, against a gap of 118. | **165** new sales so far |
 
-**Bottom line:** October needs 420 more new sales in 11 days to reach 5.4%. The sales are there: 245 customers who wanted to buy were lost to Jarvis or to how the call was handled. Fixing Jarvis, the cross-sell and discovery would have added about 172 sales so far, enough to close the 118-sale gap.
+**Bottom line:** October needs 420 more new sales in 11 days to reach 5.4%. The sales are there: 245 customers who wanted to buy were lost to Jarvis or to how the call was handled. Fixing Jarvis, the cross-sell and discovery would have added about 165 sales so far, enough to close the 118-sale gap.
 
 **Watch out for line 2:** the 5.4% there is **mobile calls that sell** (83 of 1,529 "New Mobile Plan / Port In" calls closed a sale). It is not the 5.4% target, which is all new sales ÷ all calls (4.2% so far). The two match by coincidence.
 
@@ -247,10 +247,10 @@ Only the top three queues' shares come from Optus; the rest are synthetic until 
 
 **Headline:**
 - In 1–20 October we are **118** new sales short of target so far.
-- Three fixes would have added about **172** ($149,455 of first-year revenue), *enough to close the gap*.
+- Three fixes would have added about **165** ($143,358 of first-year revenue), *enough to close the gap*.
 - The month still needs **420** new sales in 11 days.
 
-*September: 219 short; the same fixes were worth 283.*
+*September: 219 short; the same fixes were worth 271.*
 
 **The recovery plan:** a gap of **118** (5.4% × 10,166 calls − 431 new sales):
 
@@ -258,10 +258,10 @@ Only the top three queues' shares come from Optus; the rest are synthetic until 
 |---|---|---|---|---|---|
 | Fix Jarvis order errors (chapter 3) | IT / Optus | 50 | $43,544 | 50 new sales blocked (65 including renewals) | 85 |
 | Offer mobile on every eligible sale (chapter 4) | Training | 87 | $75,430 | 363 not offered × 24% take-up | 137 |
-| Coach discovery and ownership (chapter 4) | Team leads | 35 | $30,481 | 70 new sales lost to people causes × 50% (assumed) | 61 |
-| **Together** | | **172** | **$149,455** | **146% of the gap: enough to close it** | 283 vs 219 |
+| Coach discovery and ownership (chapter 4) | Team leads | 28 | $24,384 | 70 new sales lost to people causes × 40% (assumed) | 49 |
+| **Together** | | **165** | **$143,358** | **140% of the gap: enough to close it** | 271 vs 219 |
 
-These are planning estimates, not forecasts. Customer reasons are not in the plan, because they aren't lost sales.
+These are planning estimates, not forecasts. The 40% for coaching is our assumption (changed from 50% so the total doesn't repeat line 4's 172), to agree with the team leads. Customer reasons are not in the plan, because they aren't lost sales.
 
 **Scenario cards (1–20 October, with September underneath):**
 

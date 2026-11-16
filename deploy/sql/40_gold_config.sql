@@ -22,7 +22,7 @@ INSERT INTO {{catalog}}.{{prefix}}_gold.business_rules_config VALUES
 ('min_agent_calls', 150, 'Minimum calls in the window before a consultant is ranked. Used by qry_agent_scorecard.'),
 ('min_segment_calls', 100, 'Minimum calls before a segment (call reason, state, hour) is ranked or called out.'),
 -- The recovery plan (Command Center chapter 6)
-('people_recovery_share', 0.5, 'Share of sales lost to people causes (discovery, ownership, objection handling) that coaching is assumed to win back in the recovery plan. Assumed - a planning figure, not an observed result.'),
+('people_recovery_share', 0.4, 'Share of sales lost to people causes (discovery, ownership, objection handling) that coaching is assumed to win back in the recovery plan. Assumed - a planning figure, not an observed result.'),
 ('xsell_full_attempt_share', 1.0, 'Share of missed cross-sell opportunities assumed offered in the recovery plan (1 = every eligible sale call); the take-up is the observed attempt-to-sale rate.'),
 ('top_agents', 10, 'How many consultants the Command Center lists for coaching.');
 

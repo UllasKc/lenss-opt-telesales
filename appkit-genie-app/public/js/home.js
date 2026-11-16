@@ -96,7 +96,7 @@ const KPI_DICT = [
   ['Avoidable transfer', 'Calls we could have kept.', 'A transfer the consultant could have resolved: sent to Retention without checking other plans, a basic billing question, a plan change.'],
   ['Won back', 'Is a lost sale really lost?', 'A lost sale whose customer called again within 14 days and bought on that call.'],
   ['Coaching focus (Explorer)', 'Who to help first.', 'Consultants ranked on sale conversion over the last three months to date (August to 20 October, 150+ calls). The lowest quartile, furthest below the median, with their Elevate discovery score and cross-sell attempt rate.'],
-  ['Recovery plan', 'How the gap closes.', 'Gap = target conversion × calls this month − new sales this month. Levers: new sales Jarvis blocked; missed cross-sell opportunities × observed take-up; new sales lost to people causes × 50% (an assumption). Planning estimates, not forecasts.'],
+  ['Recovery plan', 'How the gap closes.', 'Gap = target conversion × calls this month − new sales this month. Levers: new sales Jarvis blocked; missed cross-sell opportunities × observed take-up; new sales lost to people causes × 40% (an assumption). Planning estimates, not forecasts.'],
   ['Scenarios', 'The Scenario Guide.', '1 Missed mobile cross-sell on NBN sales. 2 Jarvis errors blocking sales. 3 Lost sales from unresolved first calls. 4 Avoidable transfers. 5 Customer reasons (not lost sales). Counts are for this month, with the last full month for reference.'],
 ];
 function openKpiDict() {
@@ -541,7 +541,7 @@ function renderRecovery(s, o) {
   panel('pnlRecovery', 'The recovery plan', `${hEsc(span)}: what each fix would have added in new sales, against the gap to target so far.`,
     { q: 'How do we close the gap to the new sales conversion target this month? Rank the levers and say who owns each.', mode: 'agent' },
     stack + `<div class="table-scroll flat">${table}</div>` +
-    `<div class="panel-note">Planning estimates, not forecasts. Jarvis: new sales its errors stopped (chapter 3). Cross-sell: opportunities not offered × the observed take-up (chapter 4). Coaching: new sales lost to people causes × 50%, an assumption to agree with the team leads; who to coach first is in Explorer.</div>`);
+    `<div class="panel-note">Planning estimates, not forecasts. Jarvis: new sales its errors stopped (chapter 3). Cross-sell: opportunities not offered × the observed take-up (chapter 4). Coaching: new sales lost to people causes × 40%, an assumption to agree with the team leads; who to coach first is in Explorer.</div>`);
   const asks = {
     1: 'Which consultants missed the mobile cross-sell on NBN sales most often this month?',
     2: 'Which Jarvis errors blocked sales this month, and how long did their tickets take?',

@@ -112,10 +112,10 @@ export function evidenceNumbers(evidence: Evidence[]): number[] {
  * Targets, thresholds and source figures Genie is given (gold.business_rules_config, the space
  * instructions and the certified views): quoting them, e.g. "against the 5.4% target", is not a data claim.
  *   5.4% new sales target · 3.5% renewals · 50% FCR · 60% cross-sell attempt · 900 seconds handle time
- *   · 14-day repeat window · 3 months nesting · discovery 2 (of 5) · 150 / 100 minimum calls · 50% recovery share
+ *   · 14-day repeat window · 3 months nesting · discovery 2 (of 5) · 150 / 100 minimum calls · 40% recovery share
  *   · 10 consultants listed · Optus's reported 0.6-point Jarvis impact and 43.3% / 25.8% driver split.
  */
-const RULE_NUMBERS = [0.054, 0.035, 0.5, 0.6, 900, 14, 3, 2, 150, 100, 10, 12, 0.006, 0.433, 0.258, 5];
+const RULE_NUMBERS = [0.054, 0.035, 0.5, 0.4, 0.6, 900, 14, 3, 2, 150, 100, 10, 12, 0.006, 0.433, 0.258, 5];
 
 function supported(c: Claim, nums: number[]): boolean {
   if (!c.unit || c.percent) {

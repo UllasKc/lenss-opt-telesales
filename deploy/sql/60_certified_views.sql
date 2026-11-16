@@ -380,7 +380,7 @@ SELECT Month, 2, 'Offer mobile on every eligible sale', 'Cross-sell opportunitie
 UNION ALL
 SELECT Month, 3, 'Coach discovery and ownership', 'New sales lost to people causes x recovery share', 'Team leads',
        People_New * people_recovery_share, People_New * people_recovery_share * New_Sale_Value,
-       CONCAT(CAST(People_New AS STRING), ' new sales lost to people causes x ', CAST(ROUND(people_recovery_share*100, 0) AS STRING), '% assumed recovered') FROM base;
+       CONCAT(CAST(People_New AS STRING), ' new sales lost to people causes x ', CAST(CAST(ROUND(people_recovery_share*100, 0) AS INT) AS STRING), '% assumed recovered') FROM base;
 COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_recovery_plan IS 'Answers: "How do we close the gap to target?". For the last full month (September 2026): the gap in new sales to the new sales conversion target (Lever_Order 0), and three levers with the new sales each could add and their first-year value (AUD): fixing Jarvis order errors (observed blocked new sales), offering the cross-sell on every eligible sale (missed opportunities x the observed take-up), and coaching discovery and ownership (new sales lost to people causes x people_recovery_share, an assumption). Estimates for planning, not forecasts.';
 
 -- 17. Audits, exposed for questions about quality.

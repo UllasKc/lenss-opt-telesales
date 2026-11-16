@@ -10,6 +10,7 @@ Everything that has changed in LensS Telesales Intelligence for Optus, newest fi
 - **Banner tiles:** sales this month · new sales conversion (4.2%, against the 5.4% target) · sales stopped by Jarvis (65) · FCR. A "Synthetic data" tag sits at the bottom of the banner.
 - **Executive summary:** five one-line points, one per chapter, without reference lines; new bottom line.
 - The source workbook is unchanged; the new definition is applied in silver.
+- **Recovery plan:** the coaching lever assumes 40% of new sales lost to people causes are won back (was 50%). October: 50 + 87 + 28 = 165 against a gap of 118. September: 271 against 219.
 
 ---
 

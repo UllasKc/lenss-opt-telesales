@@ -167,5 +167,5 @@ SELECT Month, 2, 'Offer mobile on every eligible sale', 'Cross-sell opportunitie
 UNION ALL
 SELECT Month, 3, 'Coach discovery and ownership', 'New sales lost to people causes x recovery share', 'Team leads',
        People_New * people_recovery_share, People_New * people_recovery_share * New_Sale_Value,
-       CONCAT(CAST(People_New AS STRING), ' new sales lost to people causes x ', CAST(ROUND(people_recovery_share*100, 0) AS STRING), '% assumed recovered') FROM base;
+       CONCAT(CAST(People_New AS STRING), ' new sales lost to people causes x ', CAST(CAST(ROUND(people_recovery_share*100, 0) AS INT) AS STRING), '% assumed recovered') FROM base;
 COMMENT ON TABLE {{catalog}}.{{prefix}}_gold.qry_cc_recovery IS 'Answers: "How do we close the gap to target this month?". The same rules as qry_recovery_plan on the current month to date (October 2026 to the 20th): the gap in new sales to the new sales conversion target so far (Lever_Order 0) and what fixing Jarvis, offering the cross-sell on every eligible sale and coaching discovery and ownership would have added. Planning estimates, not forecasts.';
