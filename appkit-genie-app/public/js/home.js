@@ -201,8 +201,8 @@ function renderHero(s) {
   // Timestamps come from the warehouse in UTC; shown in the viewer's local time.
   const when = (v) => { const d = v ? new Date(v.replace(' ', 'T') + 'Z') : null; return d && !isNaN(d) ? d.toLocaleString('en-AU') : v; };
   document.getElementById('heroNote').innerHTML =
-    `<div>Data to ${hEsc(s.As_Of_Day_Name || '')} ${hEsc(asOfDate(s.as_of))}. Every chapter below is ${hEsc(cmSpan(s))}; ${hEsc(lfm)} is shown in small lines for reference. Pace is a straight line over the month's calendar days, not a forecast.</div>` +
-    (s.data_refreshed_at ? `<div class="hero-refresh">Data refreshed on ${when(s.data_refreshed_at)}</div>` : '');
+    `<div>Data to ${hEsc(s.As_Of_Day_Name || '')} ${hEsc(asOfDate(s.as_of))}. Every chapter below is ${hEsc(cmSpan(s))}; ${hEsc(lfm)} is shown in small lines for reference.</div>` +
+    `<div class="hero-refresh">${s.data_refreshed_at ? `Data refreshed on ${hEsc(when(s.data_refreshed_at))} ` : ''}<span class="synth-tag" title="Demo data shaped to Optus's sales and the Concentrix slides. No real customer records.">Synthetic data</span></div>`;
 }
 
 /** Executive summary: the chapters in plain lines, plus a bottom line. Each line jumps to its chapter. */
